@@ -87,7 +87,7 @@ const RoadmapVisual = () => {
       })}
 
       {/* START and FINISH labels */}
-      <div className="absolute text-xs font-bold text-accent" style={{ left: "2%", top: "3%", transform: "translateY(-50%)" }}>
+      <div className="absolute text-xs font-bold text-accent" style={{ left: "-2%", top: "3%", transform: "translateY(-50%)" }}>
         🏁 START
       </div>
       <div className="absolute text-xs font-bold text-success" style={{ left: "55%", top: "95%", transform: "translateX(-50%)" }}>
