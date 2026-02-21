@@ -9,17 +9,21 @@ const CreateAccountPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
-  const [error, setError] = useState("");
-  const { createAccount } = useAuth();
+  const [localError, setLocalError] = useState("");
+  const { createAccount, loading, error: authError } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLocalError("");
+
     if (password !== confirmPassword) {
-      setError("Passwords don't match");
+      setLocalError("Passwords don't match");
       return;
     }
-    if (createAccount(name, email, password)) {
+
+    const success = await createAccount(name, email, password);
+    if (success) {
       navigate("/about");
     }
   };
@@ -31,11 +35,17 @@ const CreateAccountPage = () => {
         <p className="text-center text-muted-foreground mb-8">Start your home buying journey</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {(localError || authError) && (
+            <div className="p-3 rounded-lg bg-destructive/10 border border-destructive text-destructive text-sm">
+              {localError || authError}
+            </div>
+          )}
           <div>
             <label className="block text-sm font-semibold text-foreground mb-1.5">Full Name</label>
             <input
               type="text" value={name} onChange={(e) => setName(e.target.value)} required
-              className="w-full px-4 py-3 rounded-xl border bg-card text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
+              disabled={loading}
+              className="w-full px-4 py-3 rounded-xl border bg-card text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-primary outline-none transition disabled:opacity-50"
               placeholder="Jane Smith"
             />
           </div>
@@ -43,7 +53,8 @@ const CreateAccountPage = () => {
             <label className="block text-sm font-semibold text-foreground mb-1.5">Email</label>
             <input
               type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-              className="w-full px-4 py-3 rounded-xl border bg-card text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
+              disabled={loading}
+              className="w-full px-4 py-3 rounded-xl border bg-card text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-primary outline-none transition disabled:opacity-50"
               placeholder="you@email.com"
             />
           </div>
@@ -52,10 +63,11 @@ const CreateAccountPage = () => {
             <div className="relative">
               <input
                 type={showPw ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required
-                className="w-full px-4 py-3 rounded-xl border bg-card text-foreground focus:ring-2 focus:ring-primary focus:border-primary outline-none transition pr-12"
+                disabled={loading}
+                className="w-full px-4 py-3 rounded-xl border bg-card text-foreground focus:ring-2 focus:ring-primary focus:border-primary outline-none transition pr-12 disabled:opacity-50"
                 placeholder="••••••••"
               />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <button type="button" onClick={() => setShowPw(!showPw)} disabled={loading} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                 {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
@@ -64,13 +76,13 @@ const CreateAccountPage = () => {
             <label className="block text-sm font-semibold text-foreground mb-1.5">Confirm Password</label>
             <input
               type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required
-              className="w-full px-4 py-3 rounded-xl border bg-card text-foreground focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
+              disabled={loading}
+              className="w-full px-4 py-3 rounded-xl border bg-card text-foreground focus:ring-2 focus:ring-primary focus:border-primary outline-none transition disabled:opacity-50"
               placeholder="••••••••"
             />
           </div>
-          {error && <p className="text-sm text-destructive font-medium">{error}</p>}
-          <button type="submit" className="w-full py-3.5 rounded-xl bg-accent text-accent-foreground font-bold text-base shadow-md hover:shadow-lg hover:scale-[1.01] transition-all">
-            Create Account
+          <button type="submit" disabled={loading} className="w-full py-3.5 rounded-xl bg-accent text-accent-foreground font-bold text-base shadow-md hover:shadow-lg hover:scale-[1.01] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
 

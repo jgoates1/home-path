@@ -45,6 +45,7 @@ const SurveyPage = () => {
   const { answers, setAnswers } = useSurvey();
   const [currentQ, setCurrentQ] = useState(0);
   const [localAnswers, setLocalAnswers] = useState<SurveyAnswers>({ ...answers });
+  const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();
 
   const q = questions[currentQ];
@@ -55,12 +56,20 @@ const SurveyPage = () => {
     setLocalAnswers((prev) => ({ ...prev, [q.key]: option }));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentQ < questions.length - 1) {
       setCurrentQ(currentQ + 1);
     } else {
-      setAnswers(localAnswers);
-      navigate("/results");
+      setIsSaving(true);
+      try {
+        await setAnswers(localAnswers);
+        navigate("/results");
+      } catch (error) {
+        console.error('Failed to save survey:', error);
+        setIsSaving(false);
+        // Still navigate even if save fails, since it's cached in localStorage
+        navigate("/results");
+      }
     }
   };
 
@@ -115,10 +124,10 @@ const SurveyPage = () => {
 
         <button
           onClick={handleNext}
-          disabled={!selected}
+          disabled={!selected || isSaving}
           className="mt-8 w-full py-4 rounded-xl bg-accent text-accent-foreground font-bold text-lg shadow-lg disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-xl hover:scale-[1.02] transition-all"
         >
-          {currentQ < questions.length - 1 ? "Next" : "Finish"}
+          {isSaving ? "Saving..." : currentQ < questions.length - 1 ? "Next" : "Finish"}
         </button>
       </div>
     </div>

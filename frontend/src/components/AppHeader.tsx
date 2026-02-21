@@ -31,7 +31,7 @@ const AppHeader = () => {
 
       <h1 className="text-lg font-heading font-bold text-primary">HomeKey</h1>
 
-      {isLoggedIn && hasCompletedSurvey ? (
+      {isLoggedIn ? (
         <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 rounded-lg hover:bg-secondary transition-colors" aria-label="Menu">
           {menuOpen ? <X className="w-6 h-6 text-foreground" /> : <Menu className="w-6 h-6 text-foreground" />}
         </button>

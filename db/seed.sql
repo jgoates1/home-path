@@ -1,8 +1,8 @@
-INSERT INTO user_info 
+INSERT INTO user_info
 (email, username, password, push_notifications_flag, current_savings, archetype)
-VALUES 
-('john.doe@email.com', 'johndoe', 'hashedpassword123', TRUE, 25000.00, 'Planner'),
-('sarah.smith@email.com', 'sarahsmith', 'hashedpassword456', FALSE, 12000.00, 'Explorer');
+VALUES
+('john.doe@email.com', 'johndoe', '$2b$10$6Odwp53S13GY0sduykZ7eenadKYjSJKIsuFFd/rhZLKdiZcTK0M9a', TRUE, 25000.00, 'Planner'),
+('sarah.smith@email.com', 'sarahsmith', '$2b$10$tbFH7YGo0.6xQhStljVAb.cAD0.huI.eaJ8JBVmi/2N873Usjs/8q', FALSE, 12000.00, 'Explorer');
 
 INSERT INTO survey_questions (question_text)
 VALUES 
