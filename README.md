@@ -1,28 +1,71 @@
 # HomePath
 
-HomePath is a full-stack web application that guides users through a home-buying journey with surveys, personalized steps, todos, and a dashboard.
+## App Summary
+
+HomePath is a full-stack web application that helps people plan and track their path to homeownership. The problem it addresses is that buying a first home is complex and overwhelming: users often don’t know where to start, what steps to take, or how to track progress. The primary users are first-time or prospective home buyers who want a guided, personalized journey. The product provides a survey to capture the user’s situation and preferences, then generates a customized set of steps and todos. Users can view a timeline, manage tasks, see survey results and insights, and update their profile—all persisted in a database so progress is saved across sessions.
 
 ## Table of Contents
 
+- [App Summary](#app-summary)
+- [Tech Stack](#tech-stack)
+- [Architecture Diagram](#architecture-diagram)
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
 - [Installation & Setup](#installation--setup)
+- [Running the Application](#running-the-application)
+- [Verifying the Vertical Slice](#verifying-the-vertical-slice)
 - [Usage](#usage)
 - [Project Structure](#project-structure)
 - [Application Routes](#application-routes)
 - [Configuration](#configuration)
-- [Tech Stack](#tech-stack)
 - [API](#api)
 - [Testing](#testing)
 - [Troubleshooting](#troubleshooting)
 - [Documentation](#documentation)
 
+## Tech Stack
+
+Technologies by layer:
+
+- **Frontend framework and tooling:** Vite, React, TypeScript, Tailwind CSS, shadcn/ui, React Router, TanStack Query
+- **Backend framework:** Express, TypeScript, Node.js
+- **Database:** PostgreSQL (database name: `homepath_db`); `pg` client in the server
+- **Authentication:** JWT (jsonwebtoken) for API auth; bcrypt for password hashing; protected routes require `Authorization: Bearer <token>`
+- **External services or APIs:** None; the app uses only the frontend, backend, and database above.
+
+## Architecture Diagram
+
+```mermaid
+flowchart LR
+  User[User]
+  Browser[Browser / Frontend]
+  API[Backend API]
+  DB[(PostgreSQL)]
+
+  User -->|"Uses"| Browser
+  Browser -->|"HTTP/REST"| API
+  API -->|"SQL"| DB
+  DB -->|"Results"| API
+  API -->|"JSON"| Browser
+  Browser -->|"Renders UI"| User
+```
+
+- The **user** interacts with the app in the **browser** (frontend at http://localhost:5173).
+- The **frontend** sends HTTP requests to the **backend API** (http://localhost:3001/api).
+- The **backend** runs SQL against **PostgreSQL** and returns JSON.
+- No external third-party services are used.
+
 ## Prerequisites
 
-- **Node.js** (v18 or later recommended) and **npm**
-- **PostgreSQL** (for the database)
+Install the following and ensure they are available in your system PATH:
 
-On **Windows**, the database scripts in `db/` are Bash-based. Use [WSL](https://docs.microsoft.com/en-us/windows/wsl/) or follow the manual setup steps in [db/README.md](db/README.md).
+| Software | Purpose | Install | Verify |
+|----------|---------|---------|--------|
+| **Node.js** (v18+) | Runtime for frontend and backend | [Official install](https://nodejs.org/) or [nvm](https://github.com/nvm-sh/nvm) | `node -v` and `npm -v` |
+| **PostgreSQL** | Database | [Official install](https://www.postgresql.org/download/) | `psql --version` |
+| **psql** | CLI to create DB and run schema/seed | Included with PostgreSQL; must be in PATH | `psql --version` |
+
+On **Windows**, the `db/` scripts are Bash-based. Use [WSL](https://docs.microsoft.com/en-us/windows/wsl/) or follow manual steps in [db/README.md](db/README.md).
 
 ## Quick Start
 
@@ -48,15 +91,59 @@ npm run dev
    npm install
    ```
 
-2. **Configure environment**
+2. **Configure environment variables**
    - Copy `.env.example` to `.env`
    - Set database credentials: `DB_USER`, `DB_PASSWORD` (or use `DATABASE_URL`)
    - Set `JWT_SECRET` for authentication (use a long, random string in production)
    - Optional: `PORT` (backend defaults to 3001 if unset)
 
-3. **Database setup**
-   - **macOS / Linux:** Run `npm run db:setup` to create the database, apply the schema, and seed sample data.
-   - **Windows:** If `npm run db:setup` is not available (Bash scripts), see [db/README.md](db/README.md) for manual steps: create the database, then run `db/schema.sql` and `db/seed.sql` with `psql`.
+3. **Create the database and load schema and seed data**
+   - **macOS / Linux:** Run `npm run db:setup`. This creates the database, runs `db/schema.sql`, then runs `db/seed.sql`.
+   - **Windows (if Bash is not available):** Create the database, then run the SQL files manually:
+     ```sh
+     createdb homepath_db
+     psql -d homepath_db -f db/schema.sql
+     psql -d homepath_db -f db/seed.sql
+     ```
+   - Alternatively use only schema: `npm run db:schema`. Only seed: `npm run db:seed`. See [db/README.md](db/README.md) for more.
+
+## Running the Application
+
+1. **Start the backend and frontend** (from the project root):
+   ```sh
+   npm run dev
+   ```
+   This runs the Express API and the Vite dev server together. Alternatively, in two terminals:
+   - `npm run dev:backend` — starts the API on port 3001
+   - `npm run dev:frontend` — starts the frontend on port 5173
+
+2. **Open the app in your browser:**  
+   **http://localhost:5173**
+
+   The backend API is at http://localhost:3001 (e.g. http://localhost:3001/api for REST endpoints).
+
+## Verifying the Vertical Slice
+
+Follow these steps to confirm that a user action updates the database and that the change persists after refresh.
+
+1. **Start the app** (see [Running the Application](#running-the-application)). Open http://localhost:5173.
+
+2. **Trigger a feature that writes to the database** — e.g. create an account:
+   - Go to **Create Account** (or http://localhost:5173/create-account).
+   - Fill in name, email, password (and archetype if required). Submit the form.
+
+3. **Confirm the database was updated:**
+   - In a terminal, connect to the database and check that the new user exists:
+     ```sh
+     psql homepath_db -c "SELECT user_id, email, username FROM user_info ORDER BY user_id DESC LIMIT 5;"
+     ```
+   - You should see the email you just registered.
+
+4. **Verify persistence after refresh:**
+   - In the browser, refresh the page (F5 or Ctrl+R).
+   - If the app keeps you logged in (e.g. redirects to /about or dashboard), the session and user data are coming from the backend/database and the change has persisted.
+
+You can repeat the same idea with other flows (e.g. complete a survey response, add a todo) and again check the corresponding tables in `psql` and that the UI shows the updated data after refresh.
 
 ## Usage
 
@@ -133,12 +220,6 @@ Environment variables are read from `.env`. Use `.env.example` as a template. Ke
 | `NODE_ENV` | `development` or `production` |
 
 See [SETUP.md](SETUP.md) and `.env.example` for more detail.
-
-## Tech Stack
-
-- **Frontend:** Vite, React, TypeScript, Tailwind CSS, shadcn/ui, React Router, TanStack Query
-- **Backend:** Express, TypeScript, JWT (jsonwebtoken), bcrypt, pg (PostgreSQL client)
-- **Database:** PostgreSQL (`homepath_db`)
 
 ## API
 
