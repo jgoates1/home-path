@@ -4,10 +4,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Database connection pool
+// Use SSL only in production (local Postgres typically doesn't support SSL)
+const isProduction = process.env.NODE_ENV === 'production';
+
 const pool = process.env.DATABASE_URL
   ? new Pool({
       connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
+      ssl: isProduction ? { rejectUnauthorized: false } : false,
       max: 10,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 2000,

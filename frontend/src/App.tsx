@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SurveyProvider } from "@/contexts/SurveyContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import AppHeader from "@/components/AppHeader";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
@@ -28,8 +29,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AuthProvider>
-          <SurveyProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <SurveyProvider>
             <AppHeader />
             <Routes>
               <Route path="/" element={<HomePage />} />
@@ -45,8 +47,9 @@ const App = () => (
               <Route path="/survey-insights" element={<ProtectedRoute><SurveyInsightsPage /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </SurveyProvider>
-        </AuthProvider>
+            </SurveyProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

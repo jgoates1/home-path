@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ["Nunito", "sans-serif"],
-        body: ["Quicksand", "sans-serif"],
+        heading: ["Roboto", "sans-serif"],
+        body: ["Roboto", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -51,6 +51,8 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        "surface-container": "hsl(var(--surface-container))",
+        "surface-container-high": "hsl(var(--surface-container-high))",
         success: {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
@@ -108,6 +110,15 @@ export default {
           from: { width: "0%" },
           to: { width: "var(--progress-width)" },
         },
+        "scale-in": {
+          from: { opacity: "0", transform: "scale(0.95)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
+        "pulse-ring": {
+          "0%": { boxShadow: "0 0 0 0 hsl(var(--primary) / 0.4)" },
+          "70%": { boxShadow: "0 0 0 10px hsl(var(--primary) / 0)" },
+          "100%": { boxShadow: "0 0 0 0 hsl(var(--primary) / 0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -117,6 +128,8 @@ export default {
         "slide-out": "slide-out 0.3s ease-out",
         "bounce-gentle": "bounce-gentle 2s ease-in-out infinite",
         "progress-fill": "progress-fill 1s ease-out forwards",
+        "scale-in": "scale-in 0.4s ease-out forwards",
+        "pulse-ring": "pulse-ring 2s ease-in-out infinite",
       },
     },
   },

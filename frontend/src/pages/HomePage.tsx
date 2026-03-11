@@ -22,11 +22,13 @@ const HomePage = () => {
       <div className="animate-fade-in flex flex-col items-center text-center max-w-md">
         <img src={dreamHome} alt="Your dream home" className="w-64 h-64 object-contain mb-8 drop-shadow-lg" />
 
-        <h1 className="text-4xl font-heading font-extrabold text-foreground mb-3">
-          Welcome to <span className="text-primary">HomeKey</span>
+        <h1 className="text-4xl md:text-5xl font-heading font-extrabold mb-3">
+          Welcome to{" "}
+          <span className="text-primary">Home</span>
+          <span className="text-secondary">Key</span>
         </h1>
 
-        <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+        <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
           Are you ready to start the journey to buy your dream home?
         </p>
 
