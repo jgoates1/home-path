@@ -66,12 +66,14 @@ app.use((req: Request, res: Response) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`\n🚀 HomePath API Server`);
-  console.log(`   Server running on http://localhost:${PORT}`);
-  console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`   Database: ${process.env.DB_NAME || 'homepath_db'}\n`);
-});
+// Start server (skip in serverless environments)
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`\n HomePath API Server`);
+    console.log(`   Server running on http://localhost:${PORT}`);
+    console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`   Database: ${process.env.DB_NAME || 'homepath_db'}\n`);
+  });
+}
 
 export default app;
