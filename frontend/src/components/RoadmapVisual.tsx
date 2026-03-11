@@ -25,34 +25,48 @@ const RoadmapVisual = () => {
     { left: "55%", top: "75%" },
   ];
 
+  const pathD = "M60 30 Q180 80 200 130 Q220 180 80 210 Q-20 240 80 290 Q180 340 190 380";
+
   return (
     <div
-      className="relative w-full"
-      style={{ height: 420 }}
+      className="relative w-full rounded-lg overflow-hidden"
+      style={{ height: 420, background: "hsl(var(--map-bg))" }}
       role="img"
       aria-label="Home buying roadmap showing your progress through 4 steps"
     >
-      {/* Road path SVG */}
+      {/* Road path SVG — visible road with map-like styling */}
       <svg
         className="absolute inset-0 w-full h-full"
         viewBox="0 0 300 400"
-        fill="none"
         preserveAspectRatio="none"
         aria-hidden="true"
       >
         <title>Roadmap path</title>
+        {/* Road fill — warm path color */}
         <path
-          d="M60 30 Q180 80 200 130 Q220 180 80 210 Q-20 240 80 290 Q180 340 190 380"
-          stroke="hsl(var(--road-bg))"
-          strokeWidth="40"
+          d={pathD}
+          stroke="hsl(var(--road-fill))"
+          strokeWidth="44"
           strokeLinecap="round"
+          strokeLinejoin="round"
           fill="none"
         />
+        {/* Road edge — subtle border for depth */}
         <path
-          d="M60 30 Q180 80 200 130 Q220 180 80 210 Q-20 240 80 290 Q180 340 190 380"
-          stroke="hsl(var(--border))"
+          d={pathD}
+          stroke="hsl(var(--road-line) / 0.4)"
+          strokeWidth="42"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        {/* Center dashed line — road markings */}
+        <path
+          d={pathD}
+          stroke="hsl(var(--road-line))"
           strokeWidth="2"
-          strokeDasharray="8 6"
+          strokeDasharray="10 8"
+          strokeLinecap="round"
           fill="none"
         />
       </svg>
@@ -69,22 +83,22 @@ const RoadmapVisual = () => {
             disabled={status === "locked"}
             aria-disabled={status === "locked"}
             aria-label={`Step ${step.id}: ${step.title} — ${statusLabel(status)}`}
-            className={`absolute flex flex-col items-center gap-1.5 transition-all duration-300 group focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-2xl p-1 ${
-              status === "locked" ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:scale-110"
+            className={`absolute flex flex-col items-center gap-1.5 transition-colors duration-200 group focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg p-1 ${
+              status === "locked" ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:opacity-90"
             }`}
             style={{ left: pos.left, top: pos.top, transform: "translate(-50%, 0)" }}
           >
             <div
-              className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all ${
+              className={`w-12 h-12 rounded-lg flex items-center justify-center shadow-md transition-colors ring-1 ring-offset-1 ring-offset-[hsl(var(--map-bg))] ${
                 status === "complete"
-                  ? "bg-accent text-accent-foreground ring-4 ring-accent/20"
+                  ? "bg-accent text-accent-foreground ring-accent/60"
                   : status === "active"
-                  ? "bg-primary text-primary-foreground animate-pulse-ring"
-                  : "bg-surface-container-high text-muted-foreground"
+                  ? "bg-primary text-primary-foreground ring-primary/60"
+                  : "bg-surface-container-high text-muted-foreground ring-border/70"
               }`}
             >
               {status === "complete" ? (
-                <CheckCircle2 className="w-7 h-7" aria-hidden="true" />
+                <CheckCircle2 className="w-6 h-6" aria-hidden="true" />
               ) : status === "locked" ? (
                 <Lock className="w-5 h-5" aria-hidden="true" />
               ) : (
@@ -103,11 +117,11 @@ const RoadmapVisual = () => {
       })}
 
       {/* START and FINISH labels */}
-      <div className="absolute text-xs font-bold text-secondary" style={{ left: "-2%", top: "3%", transform: "translateY(-50%)" }}>
-        🏁 START
+      <div className="absolute text-xs font-semibold text-secondary uppercase tracking-wider" style={{ left: "-2%", top: "3%", transform: "translateY(-50%)" }}>
+        Start
       </div>
-      <div className="absolute text-xs font-bold text-accent" style={{ left: "55%", top: "95%", transform: "translateX(-50%)" }}>
-        🏠 HOME!
+      <div className="absolute text-xs font-semibold text-accent uppercase tracking-wider" style={{ left: "55%", top: "95%", transform: "translateX(-50%)" }}>
+        Home
       </div>
     </div>
   );

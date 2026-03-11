@@ -2,120 +2,136 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    /* Plum & Copper — Light Theme */
-    --background: 330 15% 96%;
-    --foreground: 280 20% 18%;
+    /* Slate + Indigo — Light Theme */
+    --background: 220 14% 96%;
+    --foreground: 222 20% 14%;
 
-    --card: 330 10% 99%;
-    --card-foreground: 280 20% 18%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 20% 14%;
 
-    --popover: 330 10% 99%;
-    --popover-foreground: 280 20% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 20% 14%;
 
-    /* Primary: rich plum */
-    --primary: 280 35% 38%;
+    /* Primary: indigo */
+    --primary: 252 56% 48%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: brushed copper */
-    --secondary: 20 65% 55%;
+    /* Secondary: teal (growth, success) */
+    --secondary: 173 50% 42%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 330 10% 91%;
-    --muted-foreground: 280 10% 46%;
+    --muted: 220 14% 92%;
+    --muted-foreground: 220 10% 46%;
 
-    /* Accent: muted emerald */
-    --accent: 160 40% 42%;
+    --accent: 252 56% 48%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 60% 48%;
+    --destructive: 0 65% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 330 12% 87%;
-    --input: 330 12% 87%;
-    --ring: 280 35% 38%;
+    --border: 220 14% 88%;
+    --input: 220 14% 88%;
+    --ring: 252 56% 48%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* M3 surface-container tokens (tonal elevation) */
-    --surface-container: 330 12% 94%;
-    --surface-container-high: 330 10% 90%;
+    --surface-container: 220 14% 94%;
+    --surface-container-high: 220 12% 90%;
 
-    --sidebar-background: 330 12% 94%;
-    --sidebar-foreground: 280 20% 18%;
-    --sidebar-primary: 280 35% 38%;
+    --sidebar-background: 220 14% 94%;
+    --sidebar-foreground: 222 20% 14%;
+    --sidebar-primary: 252 56% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 330 12% 94%;
-    --sidebar-accent-foreground: 280 20% 18%;
-    --sidebar-border: 330 12% 87%;
-    --sidebar-ring: 280 35% 38%;
+    --sidebar-accent: 220 12% 90%;
+    --sidebar-accent-foreground: 222 20% 14%;
+    --sidebar-border: 220 14% 85%;
+    --sidebar-ring: 252 56% 48%;
 
-    /* Custom tokens */
-    --success: 160 40% 42%;
+    --success: 173 50% 40%;
     --success-foreground: 0 0% 100%;
     --warning: 38 85% 52%;
     --warning-foreground: 30 30% 16%;
-    --hero-gradient: linear-gradient(135deg, hsl(280 35% 38%), hsl(280 30% 28%));
-    --road-bg: 330 12% 90%;
-    --step-active: 280 35% 38%;
-    --step-complete: 160 40% 42%;
-    --step-locked: 280 8% 68%;
+    --road-bg: 220 12% 90%;
+    --road-fill: 220 10% 78%;
+    --road-line: 220 8% 60%;
+    --map-bg: 220 14% 96%;
+    --step-active: 252 56% 48%;
+    --step-complete: 173 50% 40%;
+    --step-locked: 220 8% 65%;
   }
 
   .dark {
-    /* Plum & Copper — Dark Theme */
-    --background: 280 20% 8%;
-    --foreground: 330 15% 92%;
+    /* Slate + Indigo — Dark Theme */
+    --background: 222 18% 14%;
+    --foreground: 220 14% 92%;
 
-    --card: 280 18% 12%;
-    --card-foreground: 330 15% 92%;
+    --card: 222 16% 22%;
+    --card-foreground: 220 14% 92%;
 
-    --popover: 280 18% 12%;
-    --popover-foreground: 330 15% 92%;
+    --popover: 222 16% 22%;
+    --popover-foreground: 220 14% 92%;
 
-    --primary: 280 30% 52%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 252 65% 68%;
+    --primary-foreground: 222 20% 12%;
 
-    --secondary: 20 55% 58%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 173 45% 52%;
+    --secondary-foreground: 222 20% 12%;
 
-    --muted: 280 15% 18%;
-    --muted-foreground: 280 8% 58%;
+    --muted: 222 14% 30%;
+    --muted-foreground: 220 10% 68%;
 
-    --accent: 160 35% 45%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 252 65% 68%;
+    --accent-foreground: 222 20% 12%;
 
-    --destructive: 0 50% 38%;
+    --destructive: 0 65% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 280 15% 20%;
-    --input: 280 15% 20%;
-    --ring: 280 30% 52%;
+    --border: 222 14% 36%;
+    --input: 222 14% 32%;
+    --ring: 252 65% 68%;
 
-    --surface-container: 280 16% 14%;
-    --surface-container-high: 280 14% 18%;
+    --surface-container: 222 16% 18%;
+    --surface-container-high: 222 14% 26%;
 
-    --sidebar-background: 280 16% 14%;
-    --sidebar-foreground: 330 15% 92%;
-    --sidebar-primary: 280 30% 52%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 280 15% 18%;
-    --sidebar-accent-foreground: 330 15% 92%;
-    --sidebar-border: 280 15% 20%;
-    --sidebar-ring: 280 30% 52%;
+    --sidebar-background: 222 16% 18%;
+    --sidebar-foreground: 220 14% 92%;
+    --sidebar-primary: 252 65% 68%;
+    --sidebar-primary-foreground: 222 20% 12%;
+    --sidebar-accent: 222 14% 26%;
+    --sidebar-accent-foreground: 220 14% 92%;
+    --sidebar-border: 222 14% 36%;
+    --sidebar-ring: 252 65% 68%;
 
-    --success: 160 35% 42%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 75% 50%;
+    --success: 173 45% 50%;
+    --success-foreground: 222 20% 12%;
+    --warning: 38 80% 55%;
     --warning-foreground: 30 25% 12%;
-    --hero-gradient: linear-gradient(135deg, hsl(280 30% 52%), hsl(280 25% 38%));
-    --road-bg: 280 15% 18%;
-    --step-active: 280 30% 52%;
-    --step-complete: 160 35% 42%;
-    --step-locked: 280 8% 40%;
+    --road-bg: 222 12% 28%;
+    --road-fill: 220 10% 42%;
+    --road-line: 220 8% 55%;
+    --map-bg: 222 14% 24%;
+    --step-active: 252 65% 65%;
+    --step-complete: 173 45% 50%;
+    --step-locked: 220 8% 50%;
+  }
+}
+
+@layer utilities {
+  .text-gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(252 55% 38%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-accent {
+    background: linear-gradient(135deg, hsl(var(--accent)), hsl(173 50% 35%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }
 

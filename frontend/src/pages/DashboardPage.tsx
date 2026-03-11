@@ -24,46 +24,56 @@ const DashboardPage = () => {
 
   const savingsPercent = goalAmount > 0 ? Math.min(Math.round((savedAmount / goalAmount) * 100), 100) : 0;
 
+  const formatTimeline = (t: string | undefined) => {
+    if (!t) return null;
+    if (t.toLowerCase().includes("flexible")) return "flexible timeline";
+    return t.toLowerCase();
+  };
+
   return (
     <main className="min-h-screen bg-background pb-12">
-      {/* Hero Welcome Banner */}
+      {/* Hero banner */}
       <section
-        className="w-full px-6 py-8 md:py-10 animate-fade-in"
-        style={{ background: "var(--hero-gradient)" }}
+        className="w-full px-6 md:px-8 py-8 md:py-10 bg-surface-container border-b border-border"
         role="banner"
         aria-label="Welcome section"
       >
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-heading font-extrabold text-white mb-1">
-            Welcome back, {user?.name || "Friend"} 👋
+        <div className="max-w-6xl mx-auto">
+          <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-1">Dashboard</p>
+          <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground tracking-tight">
+            Welcome back,{" "}
+            <span className="text-primary">{user?.name || "Guest"}</span>
           </h1>
-          <p className="text-base text-white/80">
-            Your goal: buy a home{" "}
-            <span className="font-bold text-white">{committedTimeline?.toLowerCase()}</span>
+          <p className="text-base mt-2">
+            <span className="text-muted-foreground">Goal: </span>
+            <span className="font-semibold text-foreground">Home purchase</span>
+            {committedTimeline && (
+              <span className="text-muted-foreground"> — {formatTimeline(committedTimeline)}</span>
+            )}
           </p>
         </div>
       </section>
 
-      <div className="max-w-5xl mx-auto px-6 -mt-6">
-        {/* Responsive 2-column grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="max-w-6xl mx-auto px-6 md:px-8 py-8">
+        {/* Responsive 2-column grid — M3 surface elevation */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mb-8">
           {/* Left: Roadmap */}
-          <div className="bg-card rounded-2xl p-6 shadow-md border border-border/50 animate-scale-in">
-            <h2 className="text-lg font-heading font-bold text-foreground mb-4">Your Home Buying Roadmap</h2>
+          <div className="bg-card rounded-lg p-6 border border-border shadow-sm overflow-hidden">
+            <h2 className="text-base font-heading font-semibold text-foreground mb-4">Home Buying Roadmap</h2>
             <RoadmapVisual />
           </div>
 
           {/* Right: Stats stack */}
           <div className="flex flex-col gap-6">
             {/* Savings Card */}
-            <div className="bg-card rounded-2xl p-6 shadow-md border-l-4 border-l-secondary border border-border/50 animate-scale-in">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-9 h-9 rounded-xl bg-secondary/15 flex items-center justify-center">
+            <div className="bg-card rounded-lg p-6 border border-border shadow-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 rounded-md bg-secondary/15 flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 text-secondary" aria-hidden="true" />
                 </div>
-                <span className="font-bold text-foreground">Savings Progress</span>
+                <span className="font-bold text-foreground text-base">Savings Progress</span>
               </div>
-              <p className="text-4xl font-heading font-extrabold text-foreground mb-2">
+              <p className="text-3xl md:text-4xl font-heading font-bold text-secondary mb-2 tracking-tight">
                 ${savedAmount.toLocaleString()}
               </p>
               <div
@@ -80,23 +90,23 @@ const DashboardPage = () => {
                 />
               </div>
               <p className="text-sm text-muted-foreground mb-3">
-                <span className="font-bold text-secondary">{savingsPercent}%</span> of your ${goalAmount.toLocaleString()} goal
+                <span className="font-bold text-secondary text-base">{savingsPercent}%</span> of ${goalAmount.toLocaleString()} goal
               </p>
               <button
                 onClick={handleUpdateSavings}
-                className="text-sm font-semibold px-4 py-2 rounded-xl bg-secondary/15 text-secondary hover:bg-secondary/25 transition-colors focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
+                className="text-sm font-medium px-3 py-2 rounded-md bg-secondary/15 text-secondary hover:bg-secondary/20 transition-colors focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
               >
                 Update savings
               </button>
             </div>
 
             {/* Overall Progress Card */}
-            <div className="bg-card rounded-2xl p-6 shadow-md border-l-4 border-l-primary border border-border/50 animate-scale-in">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center">
+            <div className="bg-card rounded-lg p-6 border border-border shadow-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 rounded-md bg-primary/15 flex items-center justify-center">
                   <Target className="w-5 h-5 text-primary" aria-hidden="true" />
                 </div>
-                <span className="font-bold text-foreground">Overall Progress</span>
+                <span className="font-bold text-foreground text-base">Overall Progress</span>
               </div>
               <div
                 className="w-full h-3 bg-muted rounded-full overflow-hidden mb-2"
@@ -112,29 +122,28 @@ const DashboardPage = () => {
                 />
               </div>
               <p className="text-sm text-muted-foreground">
-                <span className="font-bold text-primary">{completionPct}%</span> of all steps complete
+                <span className="font-bold text-primary text-base">{completionPct}%</span> of all steps complete
               </p>
             </div>
           </div>
         </div>
 
-        {/* Up Next — full width */}
-        <div className="bg-card rounded-2xl p-6 shadow-md border border-border/50 animate-scale-in">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-9 h-9 rounded-xl bg-accent/15 flex items-center justify-center">
-              <ListChecks className="w-5 h-5 text-accent" aria-hidden="true" />
+        {/* Up Next */}
+        <div className="bg-card rounded-lg p-6 border border-border shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-md bg-primary/15 flex items-center justify-center">
+              <ListChecks className="w-5 h-5 text-primary" aria-hidden="true" />
             </div>
-            <h3 className="font-bold text-foreground text-lg">Up Next</h3>
+            <h3 className="font-semibold text-foreground text-base">Up Next</h3>
           </div>
           <ul className="space-y-2">
-            {upNextTodos.map((todo, i) => (
+            {upNextTodos.map((todo) => (
               <li
                 key={todo.id}
-                className="flex items-start gap-3 p-3 rounded-xl hover:bg-surface-container transition-colors"
-                style={{ animationDelay: `${i * 80}ms` }}
+                className="flex items-start gap-3 p-3 rounded-lg hover:bg-surface-container transition-colors"
               >
                 <div
-                  className="w-5 h-5 rounded-md border-2 border-primary/40 mt-0.5 shrink-0"
+                  className="w-4 h-4 rounded-sm border-2 border-muted-foreground/50 mt-0.5 shrink-0"
                   aria-label={`Incomplete task: ${todo.text}`}
                 />
                 <div>
@@ -144,7 +153,7 @@ const DashboardPage = () => {
               </li>
             ))}
             {upNextTodos.length === 0 && (
-              <p className="text-sm text-muted-foreground p-3">🎉 All tasks complete! You're ready to buy!</p>
+              <p className="text-base font-semibold text-secondary p-3">All tasks complete. You&apos;re ready to buy.</p>
             )}
           </ul>
         </div>
