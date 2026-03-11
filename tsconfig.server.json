@@ -1,5 +1,4 @@
 {
-  "extends": "./tsconfig.json",
   "compilerOptions": {
     "module": "commonjs",
     "outDir": "./dist",
@@ -11,6 +10,6 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true
   },
-  "include": ["server/**/*"],
+  "include": ["server/**/*", "api/**/*"],
   "exclude": ["node_modules", "dist", "src", "db"]
 }
