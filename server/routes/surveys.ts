@@ -1,6 +1,6 @@
 import { Router, Response } from 'express';
-import pool from '../db/pool';
-import { authenticateToken, AuthRequest } from '../middleware/auth';
+import pool from '../db/pool.js';
+import { authenticateToken, AuthRequest } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -81,7 +81,7 @@ router.post('/responses', authenticateToken, async (req: AuthRequest, res: Respo
 
 // Submit multiple responses at once
 router.post('/responses/batch', authenticateToken, async (req: AuthRequest, res: Response) => {
-  const { responses } = req.body; // Array of { questionId, response }
+  const { responses } = req.body;
 
   try {
     if (!responses || !Array.isArray(responses)) {

@@ -1,11 +1,11 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import authRoutes from './routes/auth';
-import userRoutes from './routes/users';
-import surveyRoutes from './routes/surveys';
-import todoRoutes from './routes/todos';
-import stepsRoutes from './routes/steps';
+import authRoutes from './routes/auth.js';
+import userRoutes from './routes/users.js';
+import surveyRoutes from './routes/surveys.js';
+import todoRoutes from './routes/todos.js';
+import stepsRoutes from './routes/steps.js';
 
 // Load environment variables
 dotenv.config();

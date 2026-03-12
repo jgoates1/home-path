@@ -1,6 +1,6 @@
 import { Router, Response } from 'express';
-import pool from '../db/pool';
-import { authenticateToken, AuthRequest } from '../middleware/auth';
+import pool from '../db/pool.js';
+import { authenticateToken, AuthRequest } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -86,7 +86,6 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
       }
     });
   } catch (error: any) {
-    // Handle unique constraint violations
     if (error.code === '23505') {
       return res.status(409).json({
         error: 'A step with this order or name already exists for this user'
