@@ -133,6 +133,85 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+  .confetti-piece {
+    position: absolute;
+    width: 8px;
+    height: 14px;
+    border-radius: 9999px;
+    left: 50%;
+    top: 45%;
+    opacity: 0;
+    animation-duration: 2.6s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+  }
+}
+
+@keyframes confetti-out-up {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-50%, -150vmax) scale(0.3) rotate(720deg); opacity: 0; }
+}
+@keyframes confetti-out-down {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-50%, 150vmax) scale(0.3) rotate(-720deg); opacity: 0; }
+}
+@keyframes confetti-out-left {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-150vmax, -50%) scale(0.3) rotate(540deg); opacity: 0; }
+}
+@keyframes confetti-out-right {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(150vmax, -50%) scale(0.3) rotate(-540deg); opacity: 0; }
+}
+@keyframes confetti-out-ne {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(100vmax, -100vmax) scale(0.3) rotate(630deg); opacity: 0; }
+}
+@keyframes confetti-out-nw {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-100vmax, -100vmax) scale(0.3) rotate(-630deg); opacity: 0; }
+}
+@keyframes confetti-out-se {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(100vmax, 100vmax) scale(0.3) rotate(-630deg); opacity: 0; }
+}
+@keyframes confetti-out-sw {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-100vmax, 100vmax) scale(0.3) rotate(630deg); opacity: 0; }
+}
+
+/* Extra directional variants for a denser burst */
+@keyframes confetti-out-nne {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(40vmax, -140vmax) scale(0.3) rotate(900deg); opacity: 0; }
+}
+@keyframes confetti-out-ene {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(140vmax, -40vmax) scale(0.3) rotate(-900deg); opacity: 0; }
+}
+@keyframes confetti-out-ese {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(140vmax, 40vmax) scale(0.3) rotate(900deg); opacity: 0; }
+}
+@keyframes confetti-out-sse {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(40vmax, 140vmax) scale(0.3) rotate(-900deg); opacity: 0; }
+}
+@keyframes confetti-out-ssw {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-40vmax, 140vmax) scale(0.3) rotate(900deg); opacity: 0; }
+}
+@keyframes confetti-out-wsw {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-140vmax, 40vmax) scale(0.3) rotate(-900deg); opacity: 0; }
+}
+@keyframes confetti-out-wnw {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-140vmax, -40vmax) scale(0.3) rotate(900deg); opacity: 0; }
+}
+@keyframes confetti-out-nnw {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-40vmax, -140vmax) scale(0.3) rotate(-900deg); opacity: 0; }
 }
 
 @layer base {

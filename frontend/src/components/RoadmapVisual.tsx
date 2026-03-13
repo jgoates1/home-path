@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { useSurvey } from "@/contexts/SurveyContext";
 import { CheckCircle2, Lock } from "lucide-react";
@@ -6,6 +7,78 @@ import { CheckCircle2, Lock } from "lucide-react";
 const RoadmapVisual = () => {
   const { steps, currentStep } = useSurvey();
   const navigate = useNavigate();
+
+   // SVG path refs for animated progress and car position
+  const pathRef = useRef<SVGPathElement | null>(null);
+  const [pathLength, setPathLength] = useState(0);
+  const [carPos, setCarPos] = useState<{ x: number; y: number } | null>(null);
+
+  // Compute coarse progress along the journey (0 at first step, 1 at last step)
+  const totalSteps = steps.length || 1;
+  const clampedCurrent = Math.min(Math.max(currentStep, 1), totalSteps);
+  const progressFraction = totalSteps > 1 ? (clampedCurrent - 1) / (totalSteps - 1) : 0;
+
+  useEffect(() => {
+    if (!pathRef.current) return;
+    try {
+      const length = pathRef.current.getTotalLength();
+      setPathLength(length);
+    } catch {
+      // Fail silently if path metrics are unavailable
+    }
+  }, []);
+
+  const dashLength = pathLength || 1;
+  const progressOffset = dashLength * (1 - progressFraction);
+
+  useEffect(() => {
+    if (!pathRef.current || !pathLength) return;
+    try {
+      const distance = pathLength * progressFraction;
+      const point = pathRef.current.getPointAtLength(distance);
+      setCarPos({ x: point.x, y: point.y });
+    } catch {
+      // Ignore if SVG length computation fails
+    }
+  }, [pathLength, progressFraction]);
+
+  // Overall completion for celebratory effects
+  const allStepsComplete =
+    steps.length > 0 && steps.every((step) => step.todos.every((t) => t.completed));
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  useEffect(() => {
+    if (!allStepsComplete) return;
+    setShowConfetti(true);
+    const timeout = window.setTimeout(() => setShowConfetti(false), 2800);
+    return () => window.clearTimeout(timeout);
+  }, [allStepsComplete]);
+
+  const confettiAnimations = [
+    "confetti-out-up",
+    "confetti-out-down",
+    "confetti-out-left",
+    "confetti-out-right",
+    "confetti-out-ne",
+    "confetti-out-nw",
+    "confetti-out-se",
+    "confetti-out-sw",
+    "confetti-out-nne",
+    "confetti-out-ene",
+    "confetti-out-ese",
+    "confetti-out-sse",
+    "confetti-out-ssw",
+    "confetti-out-wsw",
+    "confetti-out-wnw",
+    "confetti-out-nnw",
+  ];
+  const confettiColors = [
+    "hsl(var(--primary))",
+    "hsl(var(--secondary))",
+    "hsl(var(--accent))",
+    "hsl(38 85% 55%)",
+    "hsl(280 65% 60%)",
+  ];
 
   const getStepStatus = (stepId: number) => {
     const step = steps.find((s) => s.id === stepId)!;
@@ -19,25 +92,26 @@ const RoadmapVisual = () => {
     status === "complete" ? "complete" : status === "active" ? "in progress" : "locked";
 
   const positions = [
-    { left: "15%", top: "0%" },
-    { left: "60%", top: "25%" },
-    { left: "20%", top: "50%" },
-    { left: "55%", top: "75%" },
+    // Step 1: all the way top, a little left. Step 2 & 4: right. Step 3: left of road.
+    { left: "16%", top: "2%" },    // Step 1 – Get Your Finances Ready (all the way top, a little left)
+    { left: "88%", top: "30%" },   // Step 2 – more right
+    { left: "10%", top: "54%" },   // Step 3 – left of road
+    { left: "86%", top: "78%" },   // Step 4 – more right
   ];
 
   const pathD = "M60 30 Q180 80 200 130 Q220 180 80 210 Q-20 240 80 290 Q180 340 190 380";
 
   return (
     <div
-      className="relative w-full rounded-lg overflow-hidden"
+      className="relative w-full rounded-lg overflow-hidden pl-24"
       style={{ height: 420, background: "hsl(var(--map-bg))" }}
       role="img"
       aria-label="Home buying roadmap showing your progress through 4 steps"
     >
-      {/* Road path SVG — visible road with map-like styling */}
+      {/* Road path SVG — viewBox adds left padding so road and step 1 have room */}
       <svg
         className="absolute inset-0 w-full h-full"
-        viewBox="0 0 300 400"
+        viewBox="-55 0 355 400"
         preserveAspectRatio="none"
         aria-hidden="true"
       >
@@ -69,6 +143,33 @@ const RoadmapVisual = () => {
           strokeLinecap="round"
           fill="none"
         />
+
+        {/* Progress overlay along the road */}
+        <path
+          d={pathD}
+          ref={pathRef}
+          stroke="hsl(var(--secondary))"
+          strokeWidth="6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeDasharray={dashLength}
+          strokeDashoffset={progressOffset}
+          style={{ transition: "stroke-dashoffset 800ms ease-out" }}
+          fill="none"
+          aria-hidden="true"
+        />
+
+        {/* Moving car icon following the path (uses roadmap-car.png in public/) */}
+        {carPos && (
+          <image
+            href="/roadmap-car.png"
+            x={carPos.x - 14}
+            y={carPos.y - 12}
+            width={28}
+            height={24}
+            aria-hidden="true"
+          />
+        )}
       </svg>
 
       {/* Step markers */}
@@ -84,7 +185,7 @@ const RoadmapVisual = () => {
             aria-disabled={status === "locked"}
             aria-label={`Step ${step.id}: ${step.title} — ${statusLabel(status)}`}
             className={`absolute flex flex-col items-center gap-1.5 transition-colors duration-200 group focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg p-1 ${
-              status === "locked" ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:opacity-90"
+              status === "locked" ? "cursor-not-allowed" : "cursor-pointer hover:opacity-90"
             }`}
             style={{ left: pos.left, top: pos.top, transform: "translate(-50%, 0)" }}
           >
@@ -105,24 +206,43 @@ const RoadmapVisual = () => {
                 <span className="text-lg font-bold">{step.id}</span>
               )}
             </div>
-            <span
-              className={`text-xs font-semibold text-center max-w-[100px] leading-tight ${
-                status === "complete" ? "text-accent" : status === "active" ? "text-primary" : "text-muted-foreground"
-              }`}
-            >
-              {step.title}
+            <span className="text-[0.7rem] font-semibold text-center max-w-[110px] leading-snug text-white">
+              {step.title === "Find Your Home" ? (
+                <>
+                  Find Your
+                  <br />
+                  Home
+                </>
+              ) : (
+                step.title
+              )}
             </span>
           </button>
         );
       })}
 
-      {/* START and FINISH labels */}
-      <div className="absolute text-xs font-semibold text-secondary uppercase tracking-wider" style={{ left: "-2%", top: "3%", transform: "translateY(-50%)" }}>
-        Start
-      </div>
-      <div className="absolute text-xs font-semibold text-accent uppercase tracking-wider" style={{ left: "55%", top: "95%", transform: "translateX(-50%)" }}>
-        Home
-      </div>
+      {/* Full-page confetti celebration when everything is complete (portaled to body) */}
+      {showConfetti &&
+        createPortal(
+          <div
+            className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden"
+            aria-hidden="true"
+          >
+            {Array.from({ length: 192 }).map((_, i) => (
+              <div
+                key={i}
+                className="confetti-piece"
+                style={{
+                  backgroundColor: confettiColors[i % confettiColors.length],
+                  animationName: confettiAnimations[i % confettiAnimations.length],
+                  animationDelay: `${(i % 24) * 0.03}s`,
+                }}
+              />
+            ))}
+          </div>,
+          document.body
+        )}
+
     </div>
   );
 };
