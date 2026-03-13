@@ -50,6 +50,8 @@ flowchart LR
   Browser -->|"Renders UI"| User
 ```
 
+The live website is deployed at [home-path.vercel.app](https://home-path.vercel.app).
+
 - The **user** interacts with the app in the **browser** (frontend at http://localhost:5173).
 - The **frontend** sends HTTP requests to the **backend API** (http://localhost:3001/api).
 - The **backend** runs SQL against **PostgreSQL** and returns JSON.
@@ -59,18 +61,18 @@ flowchart LR
 
 Install the following and ensure they are available in your system PATH:
 
-| Software | Purpose | Install | Verify |
-|----------|---------|---------|--------|
-| **Node.js** (v18+) | Runtime for frontend and backend | [Official install](https://nodejs.org/) or [nvm](https://github.com/nvm-sh/nvm) | `node -v` and `npm -v` |
-| **PostgreSQL** | Database | [Official install](https://www.postgresql.org/download/) | `psql --version` |
-| **psql** | CLI to create DB and run schema/seed | Included with PostgreSQL; must be in PATH | `psql --version` |
+| Software           | Purpose                              | Install                                                                         | Verify                 |
+| ------------------ | ------------------------------------ | ------------------------------------------------------------------------------- | ---------------------- |
+| **Node.js** (v18+) | Runtime for frontend and backend     | [Official install](https://nodejs.org/) or [nvm](https://github.com/nvm-sh/nvm) | `node -v` and `npm -v` |
+| **PostgreSQL**     | Database                             | [Official install](https://www.postgresql.org/download/)                        | `psql --version`       |
+| **psql**           | CLI to create DB and run schema/seed | Included with PostgreSQL; must be in PATH                                       | `psql --version`       |
 
 On **Windows**, the `db/` scripts are Bash-based. Use [WSL](https://docs.microsoft.com/en-us/windows/wsl/) or follow manual steps in [db/README.md](db/README.md).
 
 ## Quick Start
 
 ```sh
-git clone <YOUR_GIT_URL>
+git https://github.com/jgoates1/home-path.git
 cd home-path
 npm install
 cp .env.example .env
@@ -79,14 +81,15 @@ npm run db:setup
 npm run dev
 ```
 
-- **Frontend:** http://localhost:5173  
+- **Frontend:** http://localhost:5173
 - **Backend API:** http://localhost:3001
 
 ## Installation & Setup
 
 1. **Clone and install dependencies**
+
    ```sh
-   git clone <YOUR_GIT_URL>
+   git clone https://github.com/jgoates1/home-path.git
    cd home-path
    npm install
    ```
@@ -110,9 +113,11 @@ npm run dev
 ## Running the Application
 
 1. **Start the backend and frontend** (from the project root):
+
    ```sh
    npm run dev
    ```
+
    This runs the Express API and the Vite dev server together. Alternatively, in two terminals:
    - `npm run dev:backend` — starts the API on port 3001
    - `npm run dev:frontend` — starts the frontend on port 5173
@@ -147,21 +152,21 @@ You can repeat the same idea with other flows (e.g. complete a survey response, 
 
 ## Usage
 
-| Command | Description |
-|--------|-------------|
-| `npm run dev` | Start frontend and backend together |
-| `npm run dev:frontend` | Start Vite dev server only (port 5173) |
-| `npm run dev:backend` | Start Express API only (port 3001) |
-| `npm run build` | Build frontend and backend for production |
-| `npm run build:frontend` | Build React app only |
-| `npm run build:backend` | Compile TypeScript server only |
-| `npm run preview` | Serve built frontend (after `npm run build`) |
-| `npm run lint` | Run ESLint |
-| `npm run test` | Run frontend tests (Vitest) |
-| `npm run db:setup` | Create DB, run schema and seed (Bash; see db/README on Windows) |
-| `npm run db:reset` | Drop and recreate database (Bash; see db/README on Windows) |
-| `npm run db:schema` | Apply schema only: `psql -d homepath_db -f db/schema.sql` |
-| `npm run db:seed` | Run seed only: `psql -d homepath_db -f db/seed.sql` |
+| Command                  | Description                                                     |
+| ------------------------ | --------------------------------------------------------------- |
+| `npm run dev`            | Start frontend and backend together                             |
+| `npm run dev:frontend`   | Start Vite dev server only (port 5173)                          |
+| `npm run dev:backend`    | Start Express API only (port 3001)                              |
+| `npm run build`          | Build frontend and backend for production                       |
+| `npm run build:frontend` | Build React app only                                            |
+| `npm run build:backend`  | Compile TypeScript server only                                  |
+| `npm run preview`        | Serve built frontend (after `npm run build`)                    |
+| `npm run lint`           | Run ESLint                                                      |
+| `npm run test`           | Run frontend tests (Vitest)                                     |
+| `npm run db:setup`       | Create DB, run schema and seed (Bash; see db/README on Windows) |
+| `npm run db:reset`       | Drop and recreate database (Bash; see db/README on Windows)     |
+| `npm run db:schema`      | Apply schema only: `psql -d homepath_db -f db/schema.sql`       |
+| `npm run db:seed`        | Run seed only: `psql -d homepath_db -f db/seed.sql`             |
 
 ## Project Structure
 
@@ -193,31 +198,31 @@ For the full directory layout, see [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md).
 
 ## Application Routes
 
-| Path | Description | Protected |
-|------|-------------|-----------|
-| `/` | Home | No |
-| `/login` | Login | No |
-| `/create-account` | Registration | No |
-| `/about` | About | Yes |
-| `/survey` | Survey | Yes |
-| `/results` | Survey results | Yes |
-| `/timeline` | Timeline / commit | Yes |
-| `/dashboard` | Dashboard | Yes |
-| `/step/:stepId` | Step detail | Yes |
-| `/profile` | User profile | Yes |
-| `/survey-insights` | Survey insights | Yes |
-| `*` | 404 Not Found | No |
+| Path               | Description       | Protected |
+| ------------------ | ----------------- | --------- |
+| `/`                | Home              | No        |
+| `/login`           | Login             | No        |
+| `/create-account`  | Registration      | No        |
+| `/about`           | About             | Yes       |
+| `/survey`          | Survey            | Yes       |
+| `/results`         | Survey results    | Yes       |
+| `/timeline`        | Timeline / commit | Yes       |
+| `/dashboard`       | Dashboard         | Yes       |
+| `/step/:stepId`    | Step detail       | Yes       |
+| `/profile`         | User profile      | Yes       |
+| `/survey-insights` | Survey insights   | Yes       |
+| `*`                | 404 Not Found     | No        |
 
 ## Configuration
 
 Environment variables are read from `.env`. Use `.env.example` as a template. Key variables:
 
-| Variable | Description |
-|----------|-------------|
+| Variable       | Description                                                                           |
+| -------------- | ------------------------------------------------------------------------------------- |
 | `DATABASE_URL` | Full PostgreSQL URL, or use `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` |
-| `PORT` | Backend server port (default: 3001) |
-| `JWT_SECRET` | Secret for signing JWT tokens (required for auth) |
-| `NODE_ENV` | `development` or `production` |
+| `PORT`         | Backend server port (default: 3001)                                                   |
+| `JWT_SECRET`   | Secret for signing JWT tokens (required for auth)                                     |
+| `NODE_ENV`     | `development` or `production`                                                         |
 
 See [SETUP.md](SETUP.md) and `.env.example` for more detail.
 
