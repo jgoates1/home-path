@@ -1,25 +1,40 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSurvey } from "@/contexts/SurveyContext";
 import RoadmapVisual from "@/components/RoadmapVisual";
 import { TrendingUp, Target, ListChecks } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const DashboardPage = () => {
   const { user } = useAuth();
   const { savedAmount, setSavedAmount, goalAmount, getCompletionPercent, steps, committedTimeline } = useSurvey();
   const completionPct = getCompletionPercent();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
   const upNextTodos = steps
     .flatMap((s) => s.todos.map((t) => ({ ...t, stepTitle: s.title })))
     .filter((t) => !t.completed)
     .slice(0, 5);
 
-  const handleUpdateSavings = () => {
-    const input = prompt("Enter your current savings amount ($):");
-    if (input) {
-      const num = parseInt(input.replace(/[^0-9]/g, ""), 10);
-      if (!isNaN(num)) setSavedAmount(num);
+  const handleOpenModal = () => {
+    setInputValue(savedAmount.toString());
+    setModalOpen(true);
+  };
+
+  const handleConfirm = () => {
+    const num = parseInt(inputValue.replace(/[^0-9]/g, ""), 10);
+    if (!isNaN(num)) {
+      setSavedAmount(num);
     }
+    setModalOpen(false);
   };
 
   const savingsPercent = goalAmount > 0 ? Math.min(Math.round((savedAmount / goalAmount) * 100), 100) : 0;
@@ -93,7 +108,7 @@ const DashboardPage = () => {
                 <span className="font-bold text-secondary text-base">{savingsPercent}%</span> of ${goalAmount.toLocaleString()} goal
               </p>
               <button
-                onClick={handleUpdateSavings}
+                onClick={handleOpenModal}
                 className="text-sm font-medium px-3 py-2 rounded-md bg-secondary/15 text-secondary hover:bg-secondary/20 transition-colors focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
               >
                 Update savings
@@ -158,6 +173,46 @@ const DashboardPage = () => {
           </ul>
         </div>
       </div>
+
+      {/* Update Savings Modal */}
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Update Savings</DialogTitle>
+            <DialogDescription>
+              Current savings: <span className="font-semibold">${savedAmount.toLocaleString()}</span>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <label htmlFor="savings-input" className="text-sm font-medium text-foreground mb-2 block">
+              New savings amount ($)
+            </label>
+            <input
+              id="savings-input"
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleConfirm()}
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2"
+              autoFocus
+            />
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <button
+              onClick={() => setModalOpen(false)}
+              className="px-4 py-2 text-sm font-medium rounded-md border border-border bg-background text-foreground hover:bg-muted transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirm}
+              className="px-4 py-2 text-sm font-medium rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-colors"
+            >
+              Confirm
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 };

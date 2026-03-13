@@ -28,7 +28,7 @@ interface SurveyContextType {
   setAnswers: (a: SurveyAnswers) => Promise<void>;
   buyerType: string;
   savedAmount: number;
-  setSavedAmount: (n: number) => void;
+  setSavedAmount: (n: number) => Promise<void>;
   goalAmount: number;
   steps: StepData[];
   toggleTodo: (stepId: number, todoId: string) => Promise<void>;
@@ -180,6 +180,15 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
 
         setAnswersState(mappedAnswers);
         localStorage.setItem("homeapp_survey", JSON.stringify(mappedAnswers));
+
+        // Initialize savedAmount from the savings survey response (question_id=2)
+        if (mappedAnswers.savings) {
+          const parsed = parseInt(mappedAnswers.savings.replace(/[^0-9]/g, ""), 10);
+          if (!isNaN(parsed)) {
+            setSavedAmountState(parsed);
+            localStorage.setItem("homeapp_saved", String(parsed));
+          }
+        }
       }
     } catch (error) {
       console.error('Failed to load survey responses from database:', error);
@@ -291,9 +300,19 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const setSavedAmount = (n: number) => {
+  const setSavedAmount = async (n: number) => {
     setSavedAmountState(n);
     localStorage.setItem("homeapp_saved", String(n));
+
+    // Persist to database (user_responses question_id=2)
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      try {
+        await api.submitSurveyResponse(2, `$${n.toLocaleString()}`);
+      } catch (error) {
+        console.error('Failed to save savings to database:', error);
+      }
+    }
   };
 
   const setCommittedTimeline = (t: string) => {
