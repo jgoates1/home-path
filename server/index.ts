@@ -6,6 +6,7 @@ import userRoutes from './routes/users.js';
 import surveyRoutes from './routes/surveys.js';
 import todoRoutes from './routes/todos.js';
 import stepsRoutes from './routes/steps.js';
+import aiTodosRoutes from './routes/ai-todos.js';
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +31,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/surveys', surveyRoutes);
 app.use('/api/todos', todoRoutes);
 app.use('/api/steps', stepsRoutes);
+app.use('/api/ai', aiTodosRoutes);
 
 // API root endpoint
 app.get('/api', (req: Request, res: Response) => {
