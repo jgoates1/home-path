@@ -108,6 +108,10 @@ npm run dev
      psql -d homepath_db -f db/schema.sql
      psql -d homepath_db -f db/seed.sql
      ```
+     ```sh
+     psql -U "YourUsername" -d homepath_db -f db/schema.sql
+     psql -U "YourUsername" -d homepath_db -f db/seed.sql
+     ```
    - Alternatively use only schema: `npm run db:schema`. Only seed: `npm run db:seed`. See [db/README.md](db/README.md) for more.
 
 ## Running the Application
