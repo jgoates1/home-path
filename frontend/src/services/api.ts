@@ -235,6 +235,32 @@ class ApiService {
     });
     return this.handleResponse(response);
   }
+
+  // AI Plan
+  async generatePlan(data: { financial: object; context: object }) {
+    const response = await fetch(`${API_BASE}/surveys/generate-plan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...this.getAuthHeader() },
+      body: JSON.stringify(data),
+    });
+    return this.handleResponse(response);
+  }
+
+  async getPlan() {
+    const response = await fetch(`${API_BASE}/surveys/plan`, {
+      headers: this.getAuthHeader(),
+    });
+    return this.handleResponse(response);
+  }
+
+  async toggleAiTodo(todoId: number, completed: boolean) {
+    const response = await fetch(`${API_BASE}/todos/ai/${todoId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...this.getAuthHeader() },
+      body: JSON.stringify({ completed }),
+    });
+    return this.handleResponse(response);
+  }
 }
 
 export const api = new ApiService();

@@ -5,7 +5,7 @@ import { User } from "lucide-react";
 
 const ProfilePage = () => {
   const { user } = useAuth();
-  const { buyerType, committedTimeline, getCompletionPercent } = useSurvey();
+  const { getCompletionPercent, planMetrics } = useSurvey();
 
   return (
     <div className="min-h-screen bg-background pb-12">
@@ -28,17 +28,15 @@ const ProfilePage = () => {
             <p className="text-lg font-semibold text-foreground">{user?.email || "—"}</p>
           </div>
           <div>
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Buyer Type</label>
-            <p className="text-lg font-semibold text-primary">{buyerType}</p>
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Timeline Goal</label>
-            <p className="text-lg font-semibold text-foreground">{committedTimeline || "Not set"}</p>
-          </div>
-          <div>
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Overall Progress</label>
             <p className="text-lg font-semibold text-accent">{getCompletionPercent()}%</p>
           </div>
+          {planMetrics && (
+            <div>
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Target Down Payment</label>
+              <p className="text-lg font-semibold text-foreground">${Math.round(planMetrics.down_payment_amount).toLocaleString()}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
