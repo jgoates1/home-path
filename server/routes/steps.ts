@@ -1,3 +1,6 @@
+// This is the file that handles routing for the dashboard and passing back info from the database
+// It already all works, I read through it and made sure it does what we want.
+
 import { Router, Response } from 'express';
 import pool from '../db/pool.js';
 import { authenticateToken, AuthRequest } from '../middleware/auth.js';
