@@ -31,6 +31,28 @@ app.use('/api/surveys', surveyRoutes);
 app.use('/api/todos', todoRoutes);
 app.use('/api/steps', stepsRoutes);
 
+// API root endpoint
+app.get('/api', (req: Request, res: Response) => {
+  res.json({
+    message: 'HomePath API',
+    version: '1.0.0',
+    endpoints: {
+      auth: {
+        register: 'POST /api/auth/register',
+        login: 'POST /api/auth/login'
+      },
+      users: {
+        profile: 'GET /api/users/me',
+        updateProfile: 'PUT /api/users/me'
+      },
+      surveys: 'GET /api/surveys',
+      todos: 'GET /api/todos',
+      steps: 'GET /api/steps'
+    },
+    documentation: 'See server/README.md for full API reference'
+  });
+});
+
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
