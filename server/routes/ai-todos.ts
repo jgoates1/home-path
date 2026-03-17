@@ -33,29 +33,6 @@ Generate 5-10 todo items. Focus on practical, actionable steps.
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-// GET /api/ai/test - Test endpoint to verify Gemini API connection
-router.get("/test", async (req: AuthRequest, res: Response) => {
-  try {
-    const result = await model.generateContent("Say hello!");
-    const response = result.response.text();
-    res.json({
-      success: true,
-      message: "Gemini API is working!",
-      model: "gemini-2.5-flash",
-      testResponse: response,
-      suggestion:
-        "If this works, the model name is correct. If not, try: gemini-1.5-pro, gemini-1.5-flash, or gemini-2.0-flash-exp",
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: (error as Error).message,
-      suggestion:
-        "Try changing the model name on line 34. Common options: gemini-1.5-pro, gemini-1.5-flash, gemini-2.0-flash-exp",
-    });
-  }
-});
-
 // POST /api/ai/generate-todos - Generate personalized todos from survey responses
 router.post(
   "/generate-todos",
