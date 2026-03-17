@@ -142,4 +142,30 @@ router.delete('/:todoId', authenticateToken, async (req: AuthRequest, res: Respo
   }
 });
 
+// Toggle AI-generated todo completion
+router.put('/ai/:todoId', authenticateToken, async (req: AuthRequest, res: Response) => {
+  const { todoId } = req.params;
+  const { completed } = req.body;
+
+  if (completed === undefined) {
+    return res.status(400).json({ error: 'completed is required' });
+  }
+
+  try {
+    const result = await pool.query(
+      'UPDATE ai_todos SET completed = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
+      [completed, todoId, req.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Todo not found' });
+    }
+
+    res.json({ id: result.rows[0].id, completed: result.rows[0].completed });
+  } catch (error) {
+    console.error('Toggle AI todo error:', error);
+    res.status(500).json({ error: 'Failed to update todo' });
+  }
+});
+
 export default router;

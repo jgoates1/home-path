@@ -1,18 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useSurvey, SurveyAnswers } from "@/contexts/SurveyContext";
+import { useSurvey } from "@/contexts/SurveyContext";
 import { ChevronLeft, Edit3 } from "lucide-react";
 
-const labels: Record<keyof SurveyAnswers, string> = {
-  income: "Annual household income",
-  savings: "Saved for down payment",
-  location: "Location preference",
-  timeline: "Home buying timeline",
-  housing: "Current housing situation",
-};
-
 const SurveyInsightsPage = () => {
-  const { answers } = useSurvey();
+  const { planMetrics, hasPlan } = useSurvey();
   const navigate = useNavigate();
 
   return (
@@ -22,17 +14,30 @@ const SurveyInsightsPage = () => {
           <ChevronLeft className="w-4 h-4" /> Back to Dashboard
         </button>
 
-        <h1 className="text-3xl font-heading font-bold text-foreground mb-2">Survey Insights</h1>
-        <p className="text-muted-foreground mb-8">Review and update your survey answers to adjust your roadmap.</p>
+        <h1 className="text-3xl font-heading font-bold text-foreground mb-2">Plan Insights</h1>
+        <p className="text-muted-foreground mb-8">Your financial snapshot from your personalized plan.</p>
 
-        <div className="space-y-4 mb-8">
-          {(Object.keys(labels) as (keyof SurveyAnswers)[]).map((key) => (
-            <div key={key} className="bg-card rounded-xl p-4 shadow-sm border">
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{labels[key]}</label>
-              <p className="text-base font-semibold text-foreground mt-1">{answers[key] || "Not answered"}</p>
-            </div>
-          ))}
-        </div>
+        {hasPlan && planMetrics ? (
+          <div className="space-y-3 mb-8">
+            {[
+              ["Recommended Down Payment", `${planMetrics.recommended_down_payment_pct}%`],
+              ["Down Payment Amount", `$${Math.round(planMetrics.down_payment_amount).toLocaleString()}`],
+              ["Closing Costs", `$${Math.round(planMetrics.closing_cost_estimate).toLocaleString()}`],
+              ["Total Cash Needed", `$${Math.round(planMetrics.total_cash_needed).toLocaleString()}`],
+              ["Monthly Savings Target", `$${Math.round(planMetrics.monthly_savings_target).toLocaleString()}`],
+              ["Months to Goal", `${planMetrics.months_to_goal}`],
+              ["Est. Monthly Mortgage", `$${Math.round(planMetrics.estimated_monthly_mortgage).toLocaleString()}`],
+              ["Debt-to-Income Ratio", `${Math.round(planMetrics.debt_to_income_ratio * 100)}%`],
+            ].map(([label, value]) => (
+              <div key={label} className="bg-card rounded-xl p-4 shadow-sm border">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{label}</label>
+                <p className="text-base font-semibold text-foreground mt-1">{value}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground mb-8">No plan yet. Complete the survey to see your insights.</p>
+        )}
 
         <button
           onClick={() => navigate("/survey")}

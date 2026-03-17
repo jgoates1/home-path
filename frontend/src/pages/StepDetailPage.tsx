@@ -12,7 +12,7 @@ const StepDetailPage = () => {
   if (!step) return <div className="p-6">Step not found.</div>;
 
   const completedCount = step.todos.filter((t) => t.completed).length;
-  const progress = Math.round((completedCount / step.todos.length) * 100);
+  const progress = step.todos.length > 0 ? Math.round((completedCount / step.todos.length) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-background pb-12">
@@ -42,41 +42,49 @@ const StepDetailPage = () => {
         </div>
 
         {/* Tips */}
-        <div className="bg-card rounded-2xl p-5 shadow-sm border mb-6">
-          <h3 className="font-bold text-foreground mb-3">Tips:</h3>
-          <ul className="space-y-2">
-            {step.tips.map((tip, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
-                <span className="text-sm text-foreground leading-relaxed">{tip}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {step.tips.length > 0 && (
+          <div className="bg-card rounded-2xl p-5 shadow-sm border mb-6">
+            <h3 className="font-bold text-foreground mb-3">Tips:</h3>
+            <ul className="space-y-2">
+              {step.tips.map((tip, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                  <span className="text-sm text-foreground leading-relaxed">{tip}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* To-dos */}
-        <div className="bg-card rounded-2xl p-5 shadow-sm border">
-          <h3 className="font-bold text-foreground mb-4">To-do:</h3>
-          <ul className="space-y-3">
-            {step.todos.map((todo) => (
-              <li key={todo.id}>
-                <button
-                  onClick={() => toggleTodo(step.id, todo.id)}
-                  className="flex items-start gap-3 w-full text-left group"
-                >
-                  {todo.completed ? (
-                    <CheckCircle2 className="w-5 h-5 text-success mt-0.5 shrink-0" />
-                  ) : (
-                    <div className="w-5 h-5 rounded border-2 border-muted-foreground/40 mt-0.5 shrink-0 group-hover:border-primary transition-colors" />
-                  )}
-                  <span className={`text-sm leading-relaxed ${todo.completed ? "line-through text-muted-foreground" : "text-foreground"}`}>
-                    {todo.text}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {step.todos.length > 0 && (
+          <div className="bg-card rounded-2xl p-5 shadow-sm border">
+            <h3 className="font-bold text-foreground mb-4">To-do:</h3>
+            <ul className="space-y-3">
+              {step.todos.map((todo) => (
+                <li key={todo.id}>
+                  <button
+                    onClick={() => toggleTodo(step.id, todo.id)}
+                    className="flex items-start gap-3 w-full text-left group"
+                  >
+                    {todo.completed ? (
+                      <CheckCircle2 className="w-5 h-5 text-success mt-0.5 shrink-0" />
+                    ) : (
+                      <div className="w-5 h-5 rounded border-2 border-muted-foreground/40 mt-0.5 shrink-0 group-hover:border-primary transition-colors" />
+                    )}
+                    <span className={`text-sm leading-relaxed ${todo.completed ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                      {todo.text}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {step.tips.length === 0 && step.todos.length === 0 && (
+          <p className="text-muted-foreground text-sm">Complete the survey to see your personalized tips and tasks for this step.</p>
+        )}
       </div>
     </div>
   );
