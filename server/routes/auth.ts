@@ -17,7 +17,7 @@ router.post('/register', async (req: Request, res: Response) => {
 
     // Check if user already exists
     const existingUser = await pool.query(
-      'SELECT * FROM user_info WHERE email = $1 OR username = $2',
+      'SELECT * FROM users WHERE email = $1 OR username = $2',
       [email, username]
     );
 
@@ -30,9 +30,9 @@ router.post('/register', async (req: Request, res: Response) => {
 
     // Create user
     const result = await pool.query(
-      `INSERT INTO user_info (email, username, password, archetype, current_savings)
+      `INSERT INTO users (email, username, password, archetype, current_savings)
        VALUES ($1, $2, $3, $4, $5)
-       RETURNING user_id, email, username, archetype, current_savings, push_notifications_flag`,
+       RETURNING user_id, email, username, archetype, current_savings, target_savings, push_notifications_flag`,
       [email, username, hashedPassword, archetype || null, 0]
     );
 
@@ -47,6 +47,7 @@ router.post('/register', async (req: Request, res: Response) => {
         username: user.username,
         archetype: user.archetype,
         currentSavings: user.current_savings,
+        targetSavings: user.target_savings,
         pushNotifications: user.push_notifications_flag
       },
       token
@@ -69,7 +70,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
     // Find user
     const result = await pool.query(
-      'SELECT * FROM user_info WHERE email = $1',
+      'SELECT * FROM users WHERE email = $1',
       [email]
     );
 
@@ -97,6 +98,7 @@ router.post('/login', async (req: Request, res: Response) => {
         username: user.username,
         archetype: user.archetype,
         currentSavings: user.current_savings,
+        targetSavings: user.target_savings,
         pushNotifications: user.push_notifications_flag
       },
       token

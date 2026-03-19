@@ -8,6 +8,7 @@ interface User {
   username: string;
   archetype: string | null;
   currentSavings: number;
+  targetSavings: number;
 }
 
 interface LoginResult {
@@ -66,7 +67,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: response.user.email,
         username: response.user.username,
         archetype: response.user.archetype,
-        currentSavings: response.user.currentSavings
+        currentSavings: response.user.currentSavings,
+        targetSavings: response.user.targetSavings
       };
 
       setUser(userData);
@@ -113,7 +115,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: response.user.email,
         username: response.user.username,
         archetype: response.user.archetype,
-        currentSavings: response.user.currentSavings
+        currentSavings: response.user.currentSavings,
+        targetSavings: response.user.targetSavings
       };
 
       setUser(userData);

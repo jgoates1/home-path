@@ -8,8 +8,8 @@ const router = Router();
 router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const result = await pool.query(
-      `SELECT user_id, email, username, archetype, current_savings, push_notifications_flag
-       FROM user_info WHERE user_id = $1`,
+      `SELECT user_id, email, username, archetype, current_savings, target_savings, push_notifications_flag
+       FROM users WHERE user_id = $1`,
       [req.userId]
     );
 
@@ -24,6 +24,7 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
       username: user.username,
       archetype: user.archetype,
       currentSavings: user.current_savings,
+      targetSavings: user.target_savings,
       pushNotifications: user.push_notifications_flag
     });
   } catch (error) {
@@ -38,13 +39,13 @@ router.put('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
 
   try {
     const result = await pool.query(
-      `UPDATE user_info
+      `UPDATE users
        SET username = COALESCE($1, username),
            archetype = COALESCE($2, archetype),
            current_savings = COALESCE($3, current_savings),
            push_notifications_flag = COALESCE($4, push_notifications_flag)
        WHERE user_id = $5
-       RETURNING user_id, email, username, archetype, current_savings, push_notifications_flag`,
+       RETURNING user_id, email, username, archetype, current_savings, target_savings, push_notifications_flag`,
       [username, archetype, currentSavings, pushNotifications, req.userId]
     );
 
@@ -57,6 +58,7 @@ router.put('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
         username: user.username,
         archetype: user.archetype,
         currentSavings: user.current_savings,
+        targetSavings: user.target_savings,
         pushNotifications: user.push_notifications_flag
       }
     });

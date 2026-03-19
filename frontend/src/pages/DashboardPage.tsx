@@ -18,7 +18,7 @@ const fmtPct = (n: number) => `${Math.round(n * 100)}%`;
 
 const DashboardPage = () => {
   const { user } = useAuth();
-  const { savedAmount, setSavedAmount, planMetrics, getCompletionPercent, steps, hasPlan } = useSurvey();
+  const { savedAmount, targetSavings, setSavedAmount, planMetrics, getCompletionPercent, steps, hasPlan } = useSurvey();
   const navigate = useNavigate();
   const completionPct = getCompletionPercent();
   const [modalOpen, setModalOpen] = useState(false);
@@ -29,7 +29,7 @@ const DashboardPage = () => {
     .filter((t) => !t.completed)
     .slice(0, 5);
 
-  const goalAmount = planMetrics?.down_payment_amount ?? 0;
+  const goalAmount = targetSavings;
   const savingsPercent = goalAmount > 0 ? Math.min(Math.round((savedAmount / goalAmount) * 100), 100) : 0;
 
   const handleConfirm = () => {
@@ -90,7 +90,7 @@ const DashboardPage = () => {
               </div>
               <p className="text-sm text-muted-foreground mb-3">
                 <span className="font-bold text-secondary text-base">{savingsPercent}%</span>
-                {goalAmount > 0 && <> of {fmt(goalAmount)} down payment goal</>}
+                {goalAmount > 0 && <> of {fmt(goalAmount)} savings goal</>}
               </p>
               <button
                 onClick={() => { setInputValue(savedAmount.toString()); setModalOpen(true); }}

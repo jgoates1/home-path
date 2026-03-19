@@ -23,6 +23,7 @@ interface SurveyContextType {
   planMetrics: PlanMetrics | null;
   steps: StepData[];
   savedAmount: number;
+  targetSavings: number;
   setSavedAmount: (n: number) => Promise<void>;
   submitSurvey: (inputs: SurveyInputs) => Promise<void>;
   toggleTodo: (stepId: number, todoId: number) => Promise<void>;
@@ -56,13 +57,17 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
   const [planMetrics, setPlanMetrics] = useState<PlanMetrics | null>(null);
   const [steps, setSteps] = useState<StepData[]>([]);
   const [savedAmount, setSavedAmountState] = useState(0);
+  const [targetSavings, setTargetSavings] = useState(50000);
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
     if (!token) return;
 
-    const sv = localStorage.getItem("homeapp_saved");
-    if (sv) setSavedAmountState(Number(sv));
+    // Load current_savings and target_savings from the user profile
+    api.getProfile().then((profile: any) => {
+      if (profile.currentSavings != null) setSavedAmountState(Number(profile.currentSavings));
+      if (profile.targetSavings != null) setTargetSavings(Number(profile.targetSavings));
+    }).catch(() => {});
 
     loadPlanFromDatabase();
   }, []);
@@ -101,7 +106,6 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
 
   const setSavedAmount = async (n: number) => {
     setSavedAmountState(n);
-    localStorage.setItem("homeapp_saved", String(n));
     try {
       await api.updateProfile({ currentSavings: n });
     } catch {
@@ -148,6 +152,11 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
     setHasPlan(false);
     setPlanMetrics(null);
     setSteps([]);
+    try {
+      const profile = await api.getProfile() as any;
+      if (profile.currentSavings != null) setSavedAmountState(Number(profile.currentSavings));
+      if (profile.targetSavings != null) setTargetSavings(Number(profile.targetSavings));
+    } catch {}
     await loadPlanFromDatabase();
   };
 
@@ -156,7 +165,7 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
       value={{
         hasPlan, isGenerating, generateError,
         planMetrics, steps,
-        savedAmount, setSavedAmount,
+        savedAmount, targetSavings, setSavedAmount,
         submitSurvey, toggleTodo,
         getCompletionPercent, reloadUserData,
       }}
