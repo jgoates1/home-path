@@ -20,8 +20,11 @@ interface SurveyContextType {
   hasPlan: boolean;
   isGenerating: boolean;
   generateError: string | null;
+  buyerType: string;
   planMetrics: PlanMetrics | null;
   steps: StepData[];
+  committedTimeline: string;
+  setCommittedTimeline: (t: string) => void;
   savedAmount: number;
   targetSavings: number;
   setSavedAmount: (n: number) => Promise<void>;
@@ -48,14 +51,26 @@ function buildStepsFromPlan(planSteps: AiPlanStep[]): StepData[] {
   }));
 }
 
+function getBuyerTypeFromTimeline(purchaseTimeline: string): string {
+  const t = (purchaseTimeline || "").toLowerCase();
+  if (!t) return "Explorer";
+  if (t.includes("within 3 months")) return "Ready Buyer";
+  if (t.includes("within 6 months")) return "Searcher";
+  if (t.includes("6") && t.includes("12")) return "Planner";
+  if (t.includes("1") && t.includes("2")) return "Planner";
+  return "Explorer";
+}
+
 const SurveyContext = createContext<SurveyContextType | undefined>(undefined);
 
 export const SurveyProvider = ({ children }: { children: ReactNode }) => {
   const [hasPlan, setHasPlan] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
+  const [buyerType, setBuyerType] = useState("Explorer");
   const [planMetrics, setPlanMetrics] = useState<PlanMetrics | null>(null);
   const [steps, setSteps] = useState<StepData[]>([]);
+  const [committedTimeline, setCommittedTimelineState] = useState("");
   const [savedAmount, setSavedAmountState] = useState(0);
   const [targetSavings, setTargetSavings] = useState(50000);
 
@@ -68,6 +83,9 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
       if (profile.currentSavings != null) setSavedAmountState(Number(profile.currentSavings));
       if (profile.targetSavings != null) setTargetSavings(Number(profile.targetSavings));
     }).catch(() => {});
+
+    const ct = localStorage.getItem("homeapp_timeline_commit");
+    if (ct) setCommittedTimelineState(ct);
 
     loadPlanFromDatabase();
   }, []);
@@ -94,6 +112,7 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
     setIsGenerating(true);
     setGenerateError(null);
     try {
+      setBuyerType(getBuyerTypeFromTimeline(inputs.context?.purchase_timeline ?? ""));
       const plan = await api.generatePlan(inputs) as any;
       applyPlan(plan);
     } catch (err: any) {
@@ -102,6 +121,11 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const setCommittedTimeline = (t: string) => {
+    setCommittedTimelineState(t);
+    localStorage.setItem("homeapp_timeline_commit", t);
   };
 
   const setSavedAmount = async (n: number) => {
@@ -164,7 +188,9 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
     <SurveyContext.Provider
       value={{
         hasPlan, isGenerating, generateError,
+        buyerType,
         planMetrics, steps,
+        committedTimeline, setCommittedTimeline,
         savedAmount, targetSavings, setSavedAmount,
         submitSurvey, toggleTodo,
         getCompletionPercent, reloadUserData,

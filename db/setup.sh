@@ -58,7 +58,7 @@ echo "✓ Data seeded"
 echo ""
 echo "Verifying setup..."
 TABLES=$(psql -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public';")
-USERS=$(psql -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM users;")
+USERS=$(psql -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM user_info;")
 
 echo "  Tables created: $TABLES"
 echo "  Sample users: $USERS"

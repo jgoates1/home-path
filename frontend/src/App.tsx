@@ -19,6 +19,7 @@ import DashboardPage from "./pages/DashboardPage";
 import StepDetailPage from "./pages/StepDetailPage";
 import ProfilePage from "./pages/ProfilePage";
 import SurveyInsightsPage from "./pages/SurveyInsightsPage";
+import PlanLoadingPage from "./pages/PlanLoadingPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/create-account" element={<CreateAccountPage />} />
               <Route path="/about" element={<ProtectedRoute><AboutPage /></ProtectedRoute>} />
               <Route path="/survey" element={<ProtectedRoute><SurveyPage /></ProtectedRoute>} />
+              <Route path="/plan-loading" element={<ProtectedRoute><PlanLoadingPage /></ProtectedRoute>} />
               <Route path="/results" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />
               <Route path="/timeline" element={<ProtectedRoute><TimelineCommitPage /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />

@@ -39,19 +39,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    // Check if user is already logged in
-    const token = localStorage.getItem("auth_token");
-    const storedUser = localStorage.getItem("auth_user");
+    const init = async () => {
+      const token = localStorage.getItem("auth_token");
+      const storedUser = localStorage.getItem("auth_user");
 
-    if (token && storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+      const surveyed = localStorage.getItem("homeapp_surveyed");
+      if (surveyed === "true") setHasCompletedSurvey(true);
 
-    const surveyed = localStorage.getItem("homeapp_surveyed");
-    if (surveyed === "true") setHasCompletedSurvey(true);
+      if (token && storedUser) {
+        // Optimistically set user so UI can render, but validate token immediately.
+        setUser(JSON.parse(storedUser));
+        try {
+          const profile = await api.getProfile();
+          const normalized: User = {
+            id: profile.id,
+            name: profile.username,
+            email: profile.email,
+            username: profile.username,
+            archetype: profile.archetype,
+            currentSavings: Number(profile.currentSavings ?? 0),
+            targetSavings: Number(profile.targetSavings ?? 50000),
+          };
+          setUser(normalized);
+          localStorage.setItem("auth_user", JSON.stringify(normalized));
+        } catch {
+          // Token is invalid/expired (or backend changed). Clear and force re-login.
+          localStorage.removeItem("auth_token");
+          localStorage.removeItem("auth_user");
+          setUser(null);
+          setHasCompletedSurvey(false);
+        }
+      }
 
-    // Mark as initialized to prevent premature redirects
-    setIsInitialized(true);
+      setIsInitialized(true);
+    };
+
+    init();
   }, []);
 
   const login = async (email: string, password: string): Promise<LoginResult> => {
