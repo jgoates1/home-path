@@ -24,6 +24,8 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
       username: user.username,
       archetype: user.archetype,
       currentSavings: user.current_savings,
+      // NOTE: Some local schemas don't have target_savings yet.
+      targetSavings: 50000,
       pushNotifications: user.push_notifications_flag
     });
   } catch (error) {
@@ -57,6 +59,8 @@ router.put('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
         username: user.username,
         archetype: user.archetype,
         currentSavings: user.current_savings,
+        // NOTE: Some local schemas don't have target_savings yet.
+        targetSavings: 50000,
         pushNotifications: user.push_notifications_flag
       }
     });

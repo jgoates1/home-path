@@ -47,6 +47,8 @@ router.post('/register', async (req: Request, res: Response) => {
         username: user.username,
         archetype: user.archetype,
         currentSavings: user.current_savings,
+        // NOTE: Some local schemas don't have target_savings yet.
+        targetSavings: 50000,
         pushNotifications: user.push_notifications_flag
       },
       token
@@ -97,6 +99,8 @@ router.post('/login', async (req: Request, res: Response) => {
         username: user.username,
         archetype: user.archetype,
         currentSavings: user.current_savings,
+        // NOTE: Some local schemas don't have target_savings yet.
+        targetSavings: 50000,
         pushNotifications: user.push_notifications_flag
       },
       token

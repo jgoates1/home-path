@@ -94,7 +94,7 @@ const questions: Question[] = [
 type Answers = Partial<Record<FieldName, string>>;
 
 const SurveyPage = () => {
-  const { submitSurvey, isGenerating, generateError } = useSurvey();
+  const { generateError } = useSurvey();
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const navigate = useNavigate();
@@ -133,29 +133,12 @@ const SurveyPage = () => {
       current_housing:      answers.current_housing ?? "",
     };
 
-    try {
-      await submitSurvey({ financial, context } as SurveyInputs);
-      navigate("/dashboard");
-    } catch {
-      // generateError is set in context, displayed below
-    }
+    navigate("/plan-loading", { state: { financial, context } as SurveyInputs });
   };
 
   const handleBack = () => {
     if (currentQ > 0) setCurrentQ(currentQ - 1);
   };
-
-  if (isGenerating) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background px-6">
-        <div className="w-12 h-12 rounded-full border-4 border-primary border-t-transparent animate-spin mb-6" />
-        <h2 className="text-xl font-heading font-bold text-foreground mb-2">Building your plan...</h2>
-        <p className="text-muted-foreground text-center max-w-xs">
-          Our AI is analyzing your profile and creating a personalized homebuying roadmap. This takes about 10 seconds.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col px-6 py-6 bg-background">

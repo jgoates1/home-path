@@ -1,129 +1,51 @@
-CREATE TABLE user_info (
-    user_id SERIAL PRIMARY KEY,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    push_notifications_flag BOOLEAN DEFAULT FALSE,
-    current_savings DECIMAL(12,2) DEFAULT 0.00,
-    archetype VARCHAR(20)
+-- HomePath schema (aligned with current server routes)
+
+CREATE TABLE IF NOT EXISTS user_info (
+  user_id                 SERIAL PRIMARY KEY,
+  email                   VARCHAR(100) NOT NULL UNIQUE,
+  username                VARCHAR(50) NOT NULL UNIQUE,
+  password                VARCHAR(255) NOT NULL,
+  push_notifications_flag BOOLEAN DEFAULT FALSE,
+  current_savings         DECIMAL(12,2) DEFAULT 0.00,
+  archetype               VARCHAR(20)
 );
 
-CREATE TABLE survey_questions (
-    question_id SERIAL PRIMARY KEY,
-    question_text VARCHAR(200) NOT NULL
+CREATE TABLE IF NOT EXISTS steps (
+  step_id       SERIAL PRIMARY KEY,
+  user_id       INT NOT NULL REFERENCES user_info(user_id) ON DELETE CASCADE,
+  step_order    INT NOT NULL,
+  step_name     VARCHAR(50) NOT NULL,
+  step_due_date TIMESTAMP,
+  CONSTRAINT unique_user_step_name UNIQUE (user_id, step_name),
+  CONSTRAINT unique_user_step_order UNIQUE (user_id, step_order)
 );
 
-CREATE TABLE user_responses (
-    user_id INT NOT NULL,
-    question_id INT NOT NULL,
-    response VARCHAR(100),
-    date_submitted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (user_id, question_id),
-
-    CONSTRAINT fk_user
-        FOREIGN KEY (user_id)
-        REFERENCES user_info(user_id)
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_question
-        FOREIGN KEY (question_id)
-        REFERENCES survey_questions(question_id)
-        ON DELETE CASCADE
+-- Master list of available todo templates (used by user_todos feature)
+CREATE TABLE IF NOT EXISTS todo_items (
+  todo_id        SERIAL PRIMARY KEY,
+  todo_item_name VARCHAR(200) NOT NULL
 );
 
-CREATE TABLE todo_items (
-    todo_id SERIAL PRIMARY KEY,
-    todo_item_name VARCHAR(50) NOT NULL
+-- User-specific todo assignments (used by /api/todos and /api/steps/:id/todos)
+CREATE TABLE IF NOT EXISTS user_todos (
+  user_id        INT NOT NULL REFERENCES user_info(user_id) ON DELETE CASCADE,
+  todo_id        INT NOT NULL REFERENCES todo_items(todo_id) ON DELETE CASCADE,
+  step_id        INT REFERENCES steps(step_id) ON DELETE SET NULL,
+  reminder_date  TIMESTAMP,
+  due_date       TIMESTAMP,
+  current_status VARCHAR(30) DEFAULT 'Pending',
+  CONSTRAINT user_todos_pkey PRIMARY KEY (user_id, todo_id)
 );
 
-CREATE TABLE steps (
-    step_id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL,
-    step_order INT NOT NULL,
-    step_name VARCHAR(50) NOT NULL,
-    step_due_date TIMESTAMP,
-
-    CONSTRAINT fk_steps_user
-        FOREIGN KEY (user_id)
-        REFERENCES user_info(user_id)
-        ON DELETE CASCADE,
-
-    CONSTRAINT unique_user_step_name
-        UNIQUE (user_id, step_name),
-
-    CONSTRAINT unique_user_step_order
-        UNIQUE (user_id, step_order)
+CREATE TABLE IF NOT EXISTS survey_questions (
+  question_id   SERIAL PRIMARY KEY,
+  question_text TEXT NOT NULL
 );
 
-CREATE TABLE user_todos (
-    user_id INT NOT NULL,
-    todo_id INT NOT NULL,
-    step_id INT,
-    reminder_date TIMESTAMP,
-    due_date TIMESTAMP,
-    current_status VARCHAR(20) DEFAULT 'Pending',
-
-    PRIMARY KEY (user_id, todo_id),
-
-    CONSTRAINT fk_user_todos
-        FOREIGN KEY (user_id)
-        REFERENCES user_info(user_id)
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_todo
-        FOREIGN KEY (todo_id)
-        REFERENCES todo_items(todo_id)
-        ON DELETE CASCADE,
-        
-	CONSTRAINT fk_step
-        FOREIGN KEY (step_id)
-        REFERENCES steps(step_id)
-        ON DELETE SET NULL
-);
-
--- AI plan tables (Gemini integration)
-
-CREATE TABLE user_financial_profile (
-    user_id             INTEGER PRIMARY KEY REFERENCES user_info(user_id) ON DELETE CASCADE,
-    annual_income       NUMERIC,
-    current_savings     NUMERIC,
-    target_home_price   NUMERIC,
-    credit_score        INTEGER,
-    monthly_debt        NUMERIC,
-    survey_context      JSONB,
-    created_at          TIMESTAMP DEFAULT NOW(),
-    updated_at          TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE user_plan_metrics (
-    user_id                    INTEGER PRIMARY KEY REFERENCES user_info(user_id) ON DELETE CASCADE,
-    recommended_down_pct       NUMERIC,
-    down_payment_amount        NUMERIC,
-    closing_cost_estimate      NUMERIC,
-    total_cash_needed          NUMERIC,
-    savings_gap                NUMERIC,
-    monthly_savings_target     NUMERIC,
-    months_to_goal             INTEGER,
-    estimated_monthly_mortgage NUMERIC,
-    debt_to_income_ratio       NUMERIC,
-    generated_at               TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE ai_tips (
-    tip_id     SERIAL PRIMARY KEY,
-    user_id    INTEGER REFERENCES user_info(user_id) ON DELETE CASCADE,
-    step_order INTEGER NOT NULL,
-    tip_text   TEXT NOT NULL,
-    tip_order  INTEGER NOT NULL
-);
-
-CREATE TABLE ai_todos (
-    id          SERIAL PRIMARY KEY,
-    user_id     INTEGER REFERENCES user_info(user_id) ON DELETE CASCADE,
-    step_order  INTEGER NOT NULL,
-    todo_text   TEXT NOT NULL,
-    completed   BOOLEAN DEFAULT FALSE,
-    created_at  TIMESTAMP DEFAULT NOW()
+CREATE TABLE IF NOT EXISTS user_responses (
+  response_id   SERIAL PRIMARY KEY,
+  user_id       INT NOT NULL REFERENCES user_info(user_id) ON DELETE CASCADE,
+  question_id   INT NOT NULL REFERENCES survey_questions(question_id) ON DELETE CASCADE,
+  response_text TEXT NOT NULL,
+  CONSTRAINT unique_user_question UNIQUE (user_id, question_id)
 );

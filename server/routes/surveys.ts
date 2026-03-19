@@ -48,6 +48,9 @@ const planSchema = {
 };
 
 function buildModel() {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY is not set in your environment');
+  }
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
   return genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
@@ -112,6 +115,12 @@ router.post('/generate-plan', authenticateToken, async (req: AuthRequest, res: R
 
   if (!financial || !context) {
     return res.status(400).json({ error: 'financial and context are required' });
+  }
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(500).json({
+      error: 'Gemini is not configured',
+      detail: 'Missing GEMINI_API_KEY. Add it to your local .env and restart the server.',
+    });
   }
 
   for (const field of ['annual_income', 'current_savings', 'target_home_price', 'credit_score', 'monthly_debt']) {
