@@ -96,6 +96,10 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
     try {
       const plan = await api.generatePlan(inputs) as any;
       applyPlan(plan);
+      // Reload profile manually to get updated savings fields
+      const profile = await api.getProfile() as any;
+      if (profile.currentSavings != null) setSavedAmountState(Number(profile.currentSavings));
+      if (profile.targetSavings != null) setTargetSavings(Number(profile.targetSavings));
     } catch (err: any) {
       setGenerateError(err.message ?? "Failed to generate plan");
       throw err;

@@ -32,7 +32,7 @@ CREATE TABLE todo_items (
 	todo_id SERIAL PRIMARY KEY,
     step_id INT NOT NULL,
     todo_number INT NOT NULL,
-    todo_description VARCHAR(200),
+    todo_description VARCHAR(500),
     is_done BOOL DEFAULT False,
         
 	CONSTRAINT fk_todo_step
@@ -45,7 +45,7 @@ CREATE TABLE tips (
 	tip_id SERIAL PRIMARY KEY,
     step_id INT NOT NULL,
     tip_number INT NOT NULL,
-    tip_text VARCHAR(200),
+    tip_text VARCHAR(500),
         
 	CONSTRAINT fk_tip_step
         FOREIGN KEY (step_id)
