@@ -153,7 +153,11 @@ router.put('/ai/:todoId', authenticateToken, async (req: AuthRequest, res: Respo
 
   try {
     const result = await pool.query(
-      'UPDATE ai_todos SET completed = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
+      `UPDATE todo_items t
+       SET is_done = $1 
+       FROM steps s 
+       WHERE t.todo_id = $2 AND s.step_id = t.step_id AND s.user_id = $3
+       RETURNING t.todo_id as id, t.is_done as completed`,
       [completed, todoId, req.userId]
     );
 
@@ -161,7 +165,7 @@ router.put('/ai/:todoId', authenticateToken, async (req: AuthRequest, res: Respo
       return res.status(404).json({ error: 'Todo not found' });
     }
 
-    res.json({ id: result.rows[0].id, completed: result.rows[0].completed });
+    res.json(result.rows[0]);
   } catch (error) {
     console.error('Toggle AI todo error:', error);
     res.status(500).json({ error: 'Failed to update todo' });

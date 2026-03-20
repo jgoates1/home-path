@@ -20,32 +20,27 @@ CREATE TABLE IF NOT EXISTS steps (
   CONSTRAINT unique_user_step_order UNIQUE (user_id, step_order)
 );
 
--- Master list of available todo templates (used by user_todos feature)
-CREATE TABLE IF NOT EXISTS todo_items (
-  todo_id        SERIAL PRIMARY KEY,
-  todo_item_name VARCHAR(200) NOT NULL
+CREATE TABLE todo_items (
+	todo_id SERIAL PRIMARY KEY,
+    step_id INT NOT NULL,
+    todo_number INT NOT NULL,
+    todo_description VARCHAR(500),
+    is_done BOOL DEFAULT False,
+        
+	CONSTRAINT fk_todo_step
+        FOREIGN KEY (step_id)
+        REFERENCES steps(step_id)
+        ON DELETE CASCADE
 );
 
--- User-specific todo assignments (used by /api/todos and /api/steps/:id/todos)
-CREATE TABLE IF NOT EXISTS user_todos (
-  user_id        INT NOT NULL REFERENCES user_info(user_id) ON DELETE CASCADE,
-  todo_id        INT NOT NULL REFERENCES todo_items(todo_id) ON DELETE CASCADE,
-  step_id        INT REFERENCES steps(step_id) ON DELETE SET NULL,
-  reminder_date  TIMESTAMP,
-  due_date       TIMESTAMP,
-  current_status VARCHAR(30) DEFAULT 'Pending',
-  CONSTRAINT user_todos_pkey PRIMARY KEY (user_id, todo_id)
-);
-
-CREATE TABLE IF NOT EXISTS survey_questions (
-  question_id   SERIAL PRIMARY KEY,
-  question_text TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS user_responses (
-  response_id   SERIAL PRIMARY KEY,
-  user_id       INT NOT NULL REFERENCES user_info(user_id) ON DELETE CASCADE,
-  question_id   INT NOT NULL REFERENCES survey_questions(question_id) ON DELETE CASCADE,
-  response_text TEXT NOT NULL,
-  CONSTRAINT unique_user_question UNIQUE (user_id, question_id)
+CREATE TABLE tips (
+	tip_id SERIAL PRIMARY KEY,
+    step_id INT NOT NULL,
+    tip_number INT NOT NULL,
+    tip_text VARCHAR(500),
+        
+	CONSTRAINT fk_tip_step
+        FOREIGN KEY (step_id)
+        REFERENCES steps(step_id)
+        ON DELETE CASCADE
 );
