@@ -255,67 +255,51 @@ The JSON must match this exact structure:
   },
   "steps": [
     {
-      "step_order": 1,
+      "step_number": 1,
       "step_name": "Get Your Finances Ready",
-      "tips": [
-        { "text": "...", "url": "https://...", "link_label": "..." },
-        { "text": "...", "url": "https://...", "link_label": "..." },
-        { "text": "...", "url": null, "link_label": null },
-        { "text": "...", "url": null, "link_label": null }
-      ],
+      "step_goal_date": "YYYY-MM-DD",
+      "tips": ["...", "...", "...", "..."],
       "todos": [
-        { "id": 1, "text": "...", "completed": false },
-        { "id": 2, "text": "...", "completed": false },
-        { "id": 3, "text": "...", "completed": false },
-        { "id": 4, "text": "...", "completed": false }
+        { "todo_number": 1, "todo_description": "...", "is_done": false },
+        { "todo_number": 2, "todo_description": "...", "is_done": false },
+        { "todo_number": 3, "todo_description": "...", "is_done": false },
+        { "todo_number": 4, "todo_description": "...", "is_done": false }
       ]
     },
     {
-      "step_order": 2,
+      "step_number": 2,
       "step_name": "Get Pre-Approved",
-      "tips": [
-        { "text": "...", "url": "https://...", "link_label": "..." },
-        { "text": "...", "url": "https://...", "link_label": "..." },
-        { "text": "...", "url": null, "link_label": null },
-        { "text": "...", "url": null, "link_label": null }
-      ],
+      "step_goal_date": "YYYY-MM-DD",
+      "tips": ["...", "...", "...", "..."],
       "todos": [
-        { "id": 5, "text": "...", "completed": false },
-        { "id": 6, "text": "...", "completed": false },
-        { "id": 7, "text": "...", "completed": false },
-        { "id": 8, "text": "...", "completed": false }
+        { "todo_number": 1, "todo_description": "...", "is_done": false },
+        { "todo_number": 2, "todo_description": "...", "is_done": false },
+        { "todo_number": 3, "todo_description": "...", "is_done": false },
+        { "todo_number": 4, "todo_description": "...", "is_done": false }
       ]
     },
     {
-      "step_order": 3,
+      "step_number": 3,
       "step_name": "Find Your Home",
-      "tips": [
-        { "text": "...", "url": "https://...", "link_label": "..." },
-        { "text": "...", "url": null, "link_label": null },
-        { "text": "...", "url": null, "link_label": null },
-        { "text": "...", "url": null, "link_label": null }
-      ],
+      "step_goal_date": "YYYY-MM-DD",
+      "tips": ["...", "...", "...", "..."],
       "todos": [
-        { "id": 9, "text": "...", "completed": false },
-        { "id": 10, "text": "...", "completed": false },
-        { "id": 11, "text": "...", "completed": false },
-        { "id": 12, "text": "...", "completed": false }
+        { "todo_number": 1, "todo_description": "...", "is_done": false },
+        { "todo_number": 2, "todo_description": "...", "is_done": false },
+        { "todo_number": 3, "todo_description": "...", "is_done": false },
+        { "todo_number": 4, "todo_description": "...", "is_done": false }
       ]
     },
     {
-      "step_order": 4,
+      "step_number": 4,
       "step_name": "Close the Deal",
-      "tips": [
-        { "text": "...", "url": "https://...", "link_label": "..." },
-        { "text": "...", "url": null, "link_label": null },
-        { "text": "...", "url": null, "link_label": null },
-        { "text": "...", "url": null, "link_label": null }
-      ],
+      "step_goal_date": "YYYY-MM-DD",
+      "tips": ["...", "...", "...", "..."],
       "todos": [
-        { "id": 13, "text": "...", "completed": false },
-        { "id": 14, "text": "...", "completed": false },
-        { "id": 15, "text": "...", "completed": false },
-        { "id": 16, "text": "...", "completed": false }
+        { "todo_number": 1, "todo_description": "...", "is_done": false },
+        { "todo_number": 2, "todo_description": "...", "is_done": false },
+        { "todo_number": 3, "todo_description": "...", "is_done": false },
+        { "todo_number": 4, "todo_description": "...", "is_done": false }
       ]
     }
   ]
@@ -335,19 +319,25 @@ The JSON must match this exact structure:
 - `estimated_monthly_mortgage`: 30-year fixed at 7% on the loan amount (purchase_price − down_payment_amount), plus estimated property tax (~1.1% of price / 12) and insurance (~$175/mo). Add PMI (~$100/mo per $100k borrowed) if down payment is below 20% on a conventional loan.
 - `debt_to_income_ratio`: (monthly_debt + estimated_monthly_mortgage) / gross_monthly_income. Decimal format (e.g., 0.36).
 
+### Rules for step_goal_date
+- Each step must have a `step_goal_date` in `YYYY-MM-DD` format.
+- Base all dates on today's date and the buyer's stated purchase timeline.
+- Space the 4 steps evenly across the buyer's total timeline. For example, if the buyer wants to buy in 12 months: Step 1 ~3 months out, Step 2 ~6 months, Step 3 ~9 months, Step 4 = target purchase date.
+- If the buyer said "ASAP" or "3-6 months", compress the timeline accordingly — Step 1 within 4 weeks, Step 4 at the 3-6 month mark.
+- If the buyer's timeline is unrealistic given their financials (e.g. savings gap requires 18 months but they said 6), set dates based on the realistic timeline, not the stated one.
+
 ### Rules for tips
 - Exactly 4 tips per step.
-- Each tip is an object: `{ "text": string, "url": string | null, "link_label": string | null }`.
-- At least 2 tips per step must have a URL. Use only URLs from the Trusted Resource Library above.
-- `link_label` is a short label for the link, 2-4 words (e.g., "Watch the video", "Use this calculator", "Read the guide", "Find local programs").
+- Each tip is a plain string.
 - Tips explain, advise, or provide context. 2-4 sentences each. Plain English only.
-- At least 2 of the 4 tips per step must reference the buyer's actual numbers or situation.
+- At least 2 tips per step must reference the buyer's actual numbers or situation.
+- When referencing a resource from the Trusted Resource Library, include the URL inline in the tip text. Example: "Pull your free credit report at annualcreditreport.com before you apply anywhere."
 
 ### Rules for todos
 - Exactly 4 todos per step.
-- Todo IDs are globally unique integers 1–16 across all steps.
-- `completed` is always `false` on generation.
-- Keep todos under 10 words. Start with a verb. Be specific.
+- `todo_number` runs 1–4 within each step (resets each step).
+- `is_done` is always `false` on generation.
+- Keep `todo_description` under 10 words. Start with a verb. Be specific.
 - Good: "Pull your credit report at annualcreditreport.com" / "Get quotes from 3 lenders" / "Save $800/mo toward your down payment"
 - Bad: "You should consider reviewing your financial situation to determine your readiness" / "Look into potentially exploring mortgage options"
 
