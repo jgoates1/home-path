@@ -31,7 +31,7 @@ Technologies by layer:
 - **Backend framework:** Express, TypeScript, Node.js
 - **Database:** PostgreSQL (database name: `homepath_db`); `pg` client in the server
 - **Authentication:** JWT (jsonwebtoken) for API auth; bcrypt for password hashing; protected routes require `Authorization: Bearer <token>`
-- **External services or APIs:** None; the app uses only the frontend, backend, and database above.
+- **External services or APIs:** Google Gemini API for AI-powered homebuying plan generation
 
 ## Architecture Diagram
 
@@ -55,7 +55,7 @@ The live website is deployed at [home-path.vercel.app](https://home-path.vercel.
 - The **user** interacts with the app in the **browser** (frontend at http://localhost:5173).
 - The **frontend** sends HTTP requests to the **backend API** (http://localhost:3001/api).
 - The **backend** runs SQL against **PostgreSQL** and returns JSON.
-- No external third-party services are used.
+- The **backend** calls the **Google Gemini API** to generate personalized homebuying plans.
 
 ## Prerequisites
 
@@ -76,7 +76,8 @@ git https://github.com/jgoates1/home-path.git
 cd home-path
 npm install
 cp .env.example .env
-# Edit .env: set DB_USER, DB_PASSWORD, and JWT_SECRET
+# Edit .env: set DB_USER, DB_PASSWORD, JWT_SECRET, and GEMINI_API_KEY
+# Get your Gemini API key at https://aistudio.google.com/app/apikey
 npm run db:setup
 npm run dev
 ```
@@ -98,6 +99,11 @@ npm run dev
    - Copy `.env.example` to `.env`
    - Set database credentials: `DB_USER`, `DB_PASSWORD` (or use `DATABASE_URL`)
    - Set `JWT_SECRET` for authentication (use a long, random string in production)
+   - Set `GEMINI_API_KEY` for AI-powered plan generation:
+     1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+     2. Sign in with your Google account
+     3. Click "Create API Key"
+     4. Copy the key and add it to your `.env` file
    - Optional: `PORT` (backend defaults to 3001 if unset)
 
 3. **Create the database and load schema and seed data**
@@ -221,12 +227,13 @@ For the full directory layout, see [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md).
 
 Environment variables are read from `.env`. Use `.env.example` as a template. Key variables:
 
-| Variable       | Description                                                                           |
-| -------------- | ------------------------------------------------------------------------------------- |
-| `DATABASE_URL` | Full PostgreSQL URL, or use `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` |
-| `PORT`         | Backend server port (default: 3001)                                                   |
-| `JWT_SECRET`   | Secret for signing JWT tokens (required for auth)                                     |
-| `NODE_ENV`     | `development` or `production`                                                         |
+| Variable         | Description                                                                           |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| `DATABASE_URL`   | Full PostgreSQL URL, or use `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` |
+| `PORT`           | Backend server port (default: 3001)                                                   |
+| `JWT_SECRET`     | Secret for signing JWT tokens (required for auth)                                     |
+| `GEMINI_API_KEY` | Google Gemini API key for AI-powered plan generation. Get yours at [Google AI Studio](https://aistudio.google.com/app/apikey) |
+| `NODE_ENV`       | `development` or `production`                                                         |
 
 See [SETUP.md](SETUP.md) and `.env.example` for more detail.
 
