@@ -8,7 +8,7 @@ const ProfilePage = () => {
   const { getCompletionPercent, planMetrics } = useSurvey();
 
   return (
-    <div className="min-h-screen bg-background pb-12">
+    <div className="min-h-[calc(100dvh-4rem)] bg-background">
       <div className="max-w-md mx-auto px-6 py-8 animate-fade-in">
         <h1 className="text-3xl font-heading font-bold text-center text-foreground mb-8">Your Profile</h1>
 

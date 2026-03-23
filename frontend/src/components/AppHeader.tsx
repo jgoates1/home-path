@@ -27,7 +27,7 @@ const AppHeader = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between min-h-[64px] px-6 md:px-8 py-4 bg-background border-b border-border backdrop-blur-sm">
+    <header className="sticky top-0 z-50 flex h-16 items-center justify-between px-3 sm:px-6 md:px-8 bg-background border-b border-border backdrop-blur-sm">
       <button
         onClick={handleHomeClick}
         className="p-3 -m-1 rounded-md hover:bg-muted/50 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -36,7 +36,7 @@ const AppHeader = () => {
         <Home className="w-6 h-6 md:w-7 md:h-7 text-primary" />
       </button>
 
-      <h1 className="text-xl md:text-2xl font-heading font-bold tracking-tight">
+      <h1 className="text-lg sm:text-xl md:text-2xl font-heading font-bold tracking-tight">
         <span className="text-primary">Home</span>
         <span className="text-secondary">Key</span>
       </h1>

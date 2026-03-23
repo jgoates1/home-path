@@ -103,8 +103,8 @@ const RoadmapVisual = () => {
 
   return (
     <div
-      className="relative w-full rounded-lg overflow-hidden pl-24"
-      style={{ height: 420, background: "hsl(var(--map-bg))" }}
+      className="relative w-full h-[340px] sm:h-[420px] rounded-lg overflow-hidden pl-12 sm:pl-24"
+      style={{ background: "hsl(var(--map-bg))" }}
       role="img"
       aria-label="Home buying roadmap showing your progress through 4 steps"
     >
@@ -206,7 +206,7 @@ const RoadmapVisual = () => {
                 <span className="text-lg font-bold">{step.id}</span>
               )}
             </div>
-            <span className="text-[0.7rem] font-semibold text-center max-w-[110px] leading-snug text-white">
+            <span className="text-[0.65rem] sm:text-[0.7rem] font-semibold text-center max-w-[96px] sm:max-w-[110px] leading-snug text-white">
               {step.title === "Find Your Home" ? (
                 <>
                   Find Your

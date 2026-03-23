@@ -23,10 +23,10 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-background">
+    <div className="min-h-[calc(100dvh-4rem)] flex flex-col items-center justify-center px-4 sm:px-6 py-4 sm:py-6 bg-background">
       <div className="w-full max-w-sm animate-fade-in">
-        <h1 className="text-3xl font-heading font-bold text-center text-foreground mb-2">Welcome back!</h1>
-        <p className="text-center text-muted-foreground mb-8">Log in to continue your journey</p>
+        <h1 className="text-2xl sm:text-3xl font-heading font-bold text-center text-foreground mb-2">Welcome back!</h1>
+        <p className="text-center text-muted-foreground mb-6 sm:mb-8">Log in to continue your journey</p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
@@ -58,7 +58,14 @@ const LoginPage = () => {
                 className="w-full px-4 py-3 rounded-xl border bg-card text-foreground focus:ring-2 focus:ring-primary focus:border-primary outline-none transition pr-12 disabled:opacity-50"
                 placeholder="••••••••"
               />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" disabled={loading}>
+              <button
+                type="button"
+                onClick={() => setShowPw(!showPw)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                disabled={loading}
+                aria-label={showPw ? "Hide password" : "Show password"}
+                aria-pressed={showPw}
+              >
                 {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>

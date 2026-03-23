@@ -54,7 +54,7 @@ const ResultsPage = () => {
   const Icon = config.icon;
 
   return (
-    <div className="min-h-screen flex flex-col items-center px-6 py-10 bg-background">
+    <div className="min-h-[calc(100dvh-4rem)] flex flex-col items-center px-6 py-6 bg-background">
       <div className="max-w-md w-full animate-fade-in text-center">
         <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
           <Icon className={`w-12 h-12 ${config.color}`} />
