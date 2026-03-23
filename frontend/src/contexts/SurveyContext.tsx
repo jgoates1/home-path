@@ -52,12 +52,23 @@ function buildStepsFromPlan(planSteps: AiPlanStep[]): StepData[] {
 }
 
 function getBuyerTypeFromTimeline(purchaseTimeline: string): string {
-  const t = (purchaseTimeline || "").toLowerCase();
+  const raw = (purchaseTimeline || "").toLowerCase();
+  const t = raw.replaceAll("–", "-").replaceAll("—", "-").replaceAll("−", "-");
   if (!t) return "Explorer";
+
+  // New buyersurvey.md options
+  if (t.includes("just exploring")) return "Explorer";
+  if (t.includes("asap")) return "Ready Buyer";
+  if (t.includes("3-6")) return "Searcher";
+  if (t.includes("6-12")) return "Planner";
+  if (t.includes("1-2")) return "Planner";
+
+  // Backwards compatibility with older options
   if (t.includes("within 3 months")) return "Ready Buyer";
   if (t.includes("within 6 months")) return "Searcher";
   if (t.includes("6") && t.includes("12")) return "Planner";
   if (t.includes("1") && t.includes("2")) return "Planner";
+
   return "Explorer";
 }
 
