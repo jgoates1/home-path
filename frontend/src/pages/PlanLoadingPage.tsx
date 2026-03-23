@@ -39,7 +39,7 @@ const PlanLoadingPage = () => {
   }, [inputs, navigate, submitSurvey]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background px-6">
+    <div className="min-h-[calc(100dvh-4rem)] flex flex-col items-center justify-center bg-background px-6 py-6">
       <div className="w-full max-w-md text-center animate-fade-in">
         <div className="mx-auto w-14 h-14 rounded-full border-4 border-primary border-t-transparent animate-spin mb-6" />
         <h1 className="text-2xl font-heading font-bold text-foreground mb-2">

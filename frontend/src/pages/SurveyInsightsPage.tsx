@@ -8,7 +8,7 @@ const SurveyInsightsPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background pb-12">
+    <div className="min-h-[calc(100dvh-4rem)] bg-background">
       <div className="max-w-md mx-auto px-6 py-6 animate-fade-in">
         <button onClick={() => navigate("/dashboard")} className="flex items-center gap-1 text-primary font-semibold mb-6 hover:underline">
           <ChevronLeft className="w-4 h-4" /> Back to Dashboard

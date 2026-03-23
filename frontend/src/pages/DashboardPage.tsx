@@ -39,21 +39,21 @@ const DashboardPage = () => {
   };
 
   return (
-    <main className="min-h-screen bg-background pb-12">
+    <main className="min-h-[calc(100dvh-4rem)] bg-background">
       {/* Hero banner */}
-      <section className="w-full px-6 md:px-8 py-8 md:py-10 bg-surface-container border-b border-border">
+      <section className="w-full px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 bg-surface-container border-b border-border">
         <div className="max-w-6xl mx-auto">
           <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-1">Dashboard</p>
-          <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground tracking-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-foreground tracking-tight">
             Welcome back, <span className="text-primary">{user?.name || "Guest"}</span>
           </h1>
           <p className="text-base mt-2 text-muted-foreground">Goal: <span className="font-semibold text-foreground">Home purchase</span></p>
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto px-6 md:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8">
         {!hasPlan && (
-          <div className="bg-card rounded-lg p-8 border border-border shadow-sm text-center mb-8">
+          <div className="bg-card rounded-lg p-6 sm:p-8 border border-border shadow-sm text-center mb-8">
             <h2 className="text-xl font-heading font-bold text-foreground mb-2">No plan yet</h2>
             <p className="text-muted-foreground mb-4">Complete the survey to generate your personalized homebuying plan.</p>
             <button
@@ -67,7 +67,7 @@ const DashboardPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mb-8">
           {/* Left: Roadmap */}
-          <div className="bg-card rounded-lg p-6 border border-border shadow-sm overflow-hidden">
+          <div className="bg-card rounded-lg p-4 sm:p-6 border border-border shadow-sm overflow-hidden">
             <h2 className="text-base font-heading font-semibold text-foreground mb-4">Home Buying Roadmap</h2>
             <RoadmapVisual />
           </div>
@@ -75,14 +75,14 @@ const DashboardPage = () => {
           {/* Right: Stats */}
           <div className="flex flex-col gap-6">
             {/* Savings Progress */}
-            <div className="bg-card rounded-lg p-6 border border-border shadow-sm">
+            <div className="bg-card rounded-lg p-4 sm:p-6 border border-border shadow-sm">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-9 h-9 rounded-md bg-secondary/15 flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 text-secondary" />
                 </div>
                 <span className="font-bold text-foreground text-base">Savings Progress</span>
               </div>
-              <p className="text-3xl md:text-4xl font-heading font-bold text-secondary mb-2 tracking-tight">
+              <p className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-secondary mb-2 tracking-tight">
                 {fmt(savedAmount)}
               </p>
               <div className="w-full h-3 bg-muted rounded-full overflow-hidden mb-2">
@@ -101,7 +101,7 @@ const DashboardPage = () => {
             </div>
 
             {/* Overall Progress */}
-            <div className="bg-card rounded-lg p-6 border border-border shadow-sm">
+            <div className="bg-card rounded-lg p-4 sm:p-6 border border-border shadow-sm">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-9 h-9 rounded-md bg-primary/15 flex items-center justify-center">
                   <Target className="w-5 h-5 text-primary" />
@@ -120,14 +120,14 @@ const DashboardPage = () => {
 
         {/* Financial Snapshot */}
         {hasPlan && planMetrics && (
-          <div className="bg-card rounded-lg p-6 border border-border shadow-sm mb-8">
+          <div className="bg-card rounded-lg p-4 sm:p-6 border border-border shadow-sm mb-8">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-9 h-9 rounded-md bg-primary/15 flex items-center justify-center">
                 <BarChart3 className="w-5 h-5 text-primary" />
               </div>
               <h3 className="font-semibold text-foreground text-base">Financial Snapshot</h3>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               <MetricTile label="Recommended Down Payment" value={`${fmt(planMetrics.down_payment_amount)} (${planMetrics.recommended_down_payment_pct}%)`} />
               <MetricTile label="Closing Cost Estimate" value={fmt(planMetrics.closing_cost_estimate)} />
               <MetricTile label="Total Cash Needed" value={fmt(planMetrics.total_cash_needed)} />
@@ -141,7 +141,7 @@ const DashboardPage = () => {
         )}
 
         {/* Up Next */}
-        <div className="bg-card rounded-lg p-6 border border-border shadow-sm">
+        <div className="bg-card rounded-lg p-4 sm:p-6 border border-border shadow-sm">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-9 h-9 rounded-md bg-primary/15 flex items-center justify-center">
               <ListChecks className="w-5 h-5 text-primary" />
@@ -218,7 +218,7 @@ const DashboardPage = () => {
 const MetricTile = ({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) => (
   <div className="bg-surface-container rounded-lg p-4">
     <p className="text-xs text-muted-foreground mb-1">{label}</p>
-    <p className={`text-base font-bold ${highlight ? "text-destructive" : "text-foreground"}`}>{value}</p>
+    <p className={`text-base font-bold break-words ${highlight ? "text-destructive" : "text-foreground"}`}>{value}</p>
   </div>
 );
 

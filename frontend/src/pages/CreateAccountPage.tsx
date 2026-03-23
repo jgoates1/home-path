@@ -29,10 +29,10 @@ const CreateAccountPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-background">
+    <div className="min-h-[calc(100dvh-4rem)] flex flex-col items-center justify-center px-4 sm:px-6 py-4 sm:py-6 bg-background">
       <div className="w-full max-w-sm animate-fade-in">
-        <h1 className="text-3xl font-heading font-bold text-center text-foreground mb-2">Create Account</h1>
-        <p className="text-center text-muted-foreground mb-8">Start your home buying journey</p>
+        <h1 className="text-2xl sm:text-3xl font-heading font-bold text-center text-foreground mb-2">Create Account</h1>
+        <p className="text-center text-muted-foreground mb-6 sm:mb-8">Start your home buying journey</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {(localError || authError) && (
@@ -67,7 +67,14 @@ const CreateAccountPage = () => {
                 className="w-full px-4 py-3 rounded-xl border bg-card text-foreground focus:ring-2 focus:ring-primary focus:border-primary outline-none transition pr-12 disabled:opacity-50"
                 placeholder="••••••••"
               />
-              <button type="button" onClick={() => setShowPw(!showPw)} disabled={loading} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <button
+                type="button"
+                onClick={() => setShowPw(!showPw)}
+                disabled={loading}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                aria-label={showPw ? "Hide password" : "Show password"}
+                aria-pressed={showPw}
+              >
                 {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>

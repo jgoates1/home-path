@@ -13,7 +13,7 @@ const AboutPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col px-6 py-8 bg-background">
+    <div className="min-h-[calc(100dvh-4rem)] flex flex-col px-6 py-6 bg-background">
       <div className="max-w-md mx-auto w-full animate-fade-in">
         <h1 className="text-3xl font-heading font-bold text-foreground mb-2 text-center">How It Works</h1>
         <p className="text-center text-muted-foreground mb-8">
