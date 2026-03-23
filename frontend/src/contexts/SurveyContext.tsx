@@ -52,12 +52,23 @@ function buildStepsFromPlan(planSteps: AiPlanStep[]): StepData[] {
 }
 
 function getBuyerTypeFromTimeline(purchaseTimeline: string): string {
-  const t = (purchaseTimeline || "").toLowerCase();
+  const raw = (purchaseTimeline || "").toLowerCase();
+  const t = raw.replaceAll("–", "-").replaceAll("—", "-").replaceAll("−", "-");
   if (!t) return "Explorer";
+
+  // New buyersurvey.md options
+  if (t.includes("just exploring")) return "Explorer";
+  if (t.includes("asap")) return "Ready Buyer";
+  if (t.includes("3-6")) return "Searcher";
+  if (t.includes("6-12")) return "Planner";
+  if (t.includes("1-2")) return "Planner";
+
+  // Backwards compatibility with older options
   if (t.includes("within 3 months")) return "Ready Buyer";
   if (t.includes("within 6 months")) return "Searcher";
   if (t.includes("6") && t.includes("12")) return "Planner";
   if (t.includes("1") && t.includes("2")) return "Planner";
+
   return "Explorer";
 }
 
@@ -115,6 +126,10 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
       setBuyerType(getBuyerTypeFromTimeline(inputs.context?.purchase_timeline ?? ""));
       const plan = await api.generatePlan(inputs) as any;
       applyPlan(plan);
+      // Reload profile manually to get updated savings fields
+      const profile = await api.getProfile() as any;
+      if (profile.currentSavings != null) setSavedAmountState(Number(profile.currentSavings));
+      if (profile.targetSavings != null) setTargetSavings(Number(profile.targetSavings));
     } catch (err: any) {
       setGenerateError(err.message ?? "Failed to generate plan");
       throw err;

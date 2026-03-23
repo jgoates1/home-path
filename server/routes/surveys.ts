@@ -145,55 +145,31 @@ router.post('/generate-plan', authenticateToken, async (req: AuthRequest, res: R
     client = await pool.connect();
     await client.query('BEGIN');
 
+    const calcCurrentSavings = financial_metrics.total_cash_needed - financial_metrics.savings_gap;
     await client.query(
-      `INSERT INTO user_financial_profile
-         (user_id, annual_income, current_savings, target_home_price, credit_score, monthly_debt, survey_context, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
-       ON CONFLICT (user_id) DO UPDATE SET
-         annual_income = $2, current_savings = $3, target_home_price = $4,
-         credit_score = $5, monthly_debt = $6, survey_context = $7, updated_at = NOW()`,
-      [req.userId, financial.annual_income, financial.current_savings,
-       financial.target_home_price, financial.credit_score, financial.monthly_debt,
-       JSON.stringify(context)]
+      'UPDATE users SET target_savings = $1, current_savings = $2 WHERE user_id = $3',
+      [financial_metrics.total_cash_needed, calcCurrentSavings, req.userId]
     );
 
-    await client.query(
-      `INSERT INTO user_plan_metrics
-         (user_id, recommended_down_pct, down_payment_amount, closing_cost_estimate,
-          total_cash_needed, savings_gap, monthly_savings_target, months_to_goal,
-          estimated_monthly_mortgage, debt_to_income_ratio, generated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
-       ON CONFLICT (user_id) DO UPDATE SET
-         recommended_down_pct = $2, down_payment_amount = $3, closing_cost_estimate = $4,
-         total_cash_needed = $5, savings_gap = $6, monthly_savings_target = $7,
-         months_to_goal = $8, estimated_monthly_mortgage = $9, debt_to_income_ratio = $10,
-         generated_at = NOW()`,
-      [req.userId,
-       financial_metrics.recommended_down_payment_pct,
-       financial_metrics.down_payment_amount,
-       financial_metrics.closing_cost_estimate,
-       financial_metrics.total_cash_needed,
-       financial_metrics.savings_gap,
-       financial_metrics.monthly_savings_target,
-       financial_metrics.months_to_goal,
-       financial_metrics.estimated_monthly_mortgage,
-       financial_metrics.debt_to_income_ratio]
-    );
-
-    await client.query('DELETE FROM ai_tips WHERE user_id = $1', [req.userId]);
-    await client.query('DELETE FROM ai_todos WHERE user_id = $1', [req.userId]);
+    await client.query('DELETE FROM steps WHERE user_id = $1', [req.userId]);
 
     for (const step of steps) {
+      const stepResult = await client.query(
+        'INSERT INTO steps (user_id, step_number, step_name) VALUES ($1, $2, $3) RETURNING step_id',
+        [req.userId, step.step_order, step.step_name]
+      );
+      const stepId = stepResult.rows[0].step_id;
+
       for (let i = 0; i < step.tips.length; i++) {
         await client.query(
-          'INSERT INTO ai_tips (user_id, step_order, tip_text, tip_order) VALUES ($1, $2, $3, $4)',
-          [req.userId, step.step_order, step.tips[i], i + 1]
+          'INSERT INTO tips (step_id, tip_number, tip_text) VALUES ($1, $2, $3)',
+          [stepId, i + 1, step.tips[i]]
         );
       }
-      for (const todoText of step.todos) {
+      for (let i = 0; i < step.todos.length; i++) {
         await client.query(
-          'INSERT INTO ai_todos (user_id, step_order, todo_text) VALUES ($1, $2, $3)',
-          [req.userId, step.step_order, todoText]
+          'INSERT INTO todo_items (step_id, todo_number, todo_description, is_done) VALUES ($1, $2, $3, false)',
+          [stepId, i + 1, step.todos[i]]
         );
       }
     }
@@ -201,8 +177,16 @@ router.post('/generate-plan', authenticateToken, async (req: AuthRequest, res: R
     await client.query('COMMIT');
 
     const [todosResult, tipsResult] = await Promise.all([
-      pool.query('SELECT id, step_order, todo_text, completed FROM ai_todos WHERE user_id = $1 ORDER BY step_order, id', [req.userId]),
-      pool.query('SELECT step_order, tip_text FROM ai_tips WHERE user_id = $1 ORDER BY step_order, tip_order', [req.userId]),
+      pool.query(`
+        SELECT t.todo_id as id, s.step_number as step_order, t.todo_description as todo_text, t.is_done as completed 
+        FROM todo_items t JOIN steps s ON t.step_id = s.step_id 
+        WHERE s.user_id = $1 ORDER BY s.step_number, t.todo_number
+      `, [req.userId]),
+      pool.query(`
+        SELECT s.step_number as step_order, t.tip_text 
+        FROM tips t JOIN steps s ON t.step_id = s.step_id 
+        WHERE s.user_id = $1 ORDER BY s.step_number, t.tip_number
+      `, [req.userId]),
     ]);
 
     res.json(buildPlanResponse(financial_metrics, steps, todosResult.rows, tipsResult.rows));
@@ -218,37 +202,32 @@ router.post('/generate-plan', authenticateToken, async (req: AuthRequest, res: R
 // GET /api/surveys/plan
 router.get('/plan', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const metricsResult = await pool.query(
-      'SELECT * FROM user_plan_metrics WHERE user_id = $1',
-      [req.userId]
-    );
+    const [todosResult, tipsResult, stepsResult] = await Promise.all([
+      pool.query(`
+        SELECT t.todo_id as id, s.step_number as step_order, t.todo_description as todo_text, t.is_done as completed 
+        FROM todo_items t JOIN steps s ON t.step_id = s.step_id 
+        WHERE s.user_id = $1 ORDER BY s.step_number, t.todo_number
+      `, [req.userId]),
+      pool.query(`
+        SELECT s.step_number as step_order, t.tip_text 
+        FROM tips t JOIN steps s ON t.step_id = s.step_id 
+        WHERE s.user_id = $1 ORDER BY s.step_number, t.tip_number
+      `, [req.userId]),
+      pool.query('SELECT step_number, step_name FROM steps WHERE user_id = $1 ORDER BY step_number', [req.userId])
+    ]);
 
-    if (metricsResult.rows.length === 0) {
+    if (stepsResult.rows.length === 0) {
       return res.status(404).json({ error: 'No plan found' });
     }
 
-    const m = metricsResult.rows[0];
-    const financial_metrics = {
-      recommended_down_payment_pct: Number(m.recommended_down_pct),
-      down_payment_amount:          Number(m.down_payment_amount),
-      closing_cost_estimate:        Number(m.closing_cost_estimate),
-      total_cash_needed:            Number(m.total_cash_needed),
-      savings_gap:                  Number(m.savings_gap),
-      monthly_savings_target:       Number(m.monthly_savings_target),
-      months_to_goal:               Number(m.months_to_goal),
-      estimated_monthly_mortgage:   Number(m.estimated_monthly_mortgage),
-      debt_to_income_ratio:         Number(m.debt_to_income_ratio),
-    };
+    const steps = stepsResult.rows.map(s => ({
+      step_order: s.step_number,
+      step_name: s.step_name,
+      tips: [],
+      todos: []
+    }));
 
-    const [todosResult, tipsResult] = await Promise.all([
-      pool.query('SELECT id, step_order, todo_text, completed FROM ai_todos WHERE user_id = $1 ORDER BY step_order, id', [req.userId]),
-      pool.query('SELECT step_order, tip_text FROM ai_tips WHERE user_id = $1 ORDER BY step_order, tip_order', [req.userId]),
-    ]);
-
-    const stepNames = ['Get Your Finances Ready', 'Get Pre-Approved', 'Find Your Home', 'Close the Deal'];
-    const steps = stepNames.map((name, i) => ({ step_order: i + 1, step_name: name, tips: [], todos: [] }));
-
-    res.json(buildPlanResponse(financial_metrics, steps, todosResult.rows, tipsResult.rows));
+    res.json(buildPlanResponse(null, steps, todosResult.rows, tipsResult.rows));
   } catch (error) {
     console.error('get-plan error:', error);
     res.status(500).json({ error: 'Failed to load plan' });
