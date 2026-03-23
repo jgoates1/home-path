@@ -267,13 +267,12 @@ Most endpoints require a JWT in the `Authorization: Bearer <token>` header. Full
 - The system shall display the current user's savings amount.
 - A user shall be able to create an account.
 - The system shall be deployed using vercell.
-
-**Not Done:**
-
 - When a user checks a to-do item, the system shall save the done status in the database.
-- There shall be a page explaining what the product does.
 - There shall be a questionnaire for the user.
 - When a user fills out the questionnaire, the system shall save their answers to the database.
 - If a user has already filled out the questionnaire, the system shall not prompt them to answer the questions again when they log in.
 - When the user finishes the survey, the system shall make a user's profile.
 - When the user finishes the survey, the system shall generate custom suggestions with ai.
+- There shall be a page explaining what the product does.
+
+**Not Done:**
