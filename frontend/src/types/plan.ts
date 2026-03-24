@@ -20,6 +20,7 @@ export interface SurveyInputs {
 }
 
 export interface PlanMetrics {
+  recommended_loan_type: string | null;
   recommended_down_payment_pct: number;
   down_payment_amount: number;
   closing_cost_estimate: number;
@@ -34,6 +35,7 @@ export interface PlanMetrics {
 export interface AiPlanStep {
   step_order: number;
   step_name: string;
+  step_goal_date: string | null;
   tips: string[];
   todos: Array<{ id: number; text: string; completed: boolean }>;
 }
