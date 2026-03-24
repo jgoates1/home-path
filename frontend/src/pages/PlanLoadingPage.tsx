@@ -18,6 +18,7 @@ const PlanLoadingPage = () => {
 
   const inputs = (location.state as SurveyInputs | undefined) ?? undefined;
   const [idx, setIdx] = useState(0);
+  const submitted = React.useRef(false);
 
   const message = useMemo(() => funMessages[idx % funMessages.length], [idx]);
 
@@ -26,6 +27,8 @@ const PlanLoadingPage = () => {
       navigate("/survey", { replace: true });
       return;
     }
+    if (submitted.current) return;
+    submitted.current = true;
 
     const interval = window.setInterval(() => setIdx((i) => i + 1), 1700);
 
@@ -36,7 +39,8 @@ const PlanLoadingPage = () => {
       });
 
     return () => window.clearInterval(interval);
-  }, [inputs, navigate, submitSurvey]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-6">
