@@ -4,14 +4,52 @@ export interface FinancialProfile {
   target_home_price: number;
   credit_score: number;
   monthly_debt: number;
+  other_income?: number;
+  total_assets?: number;
 }
 
 export interface SurveyContext {
+  // Section 1
+  buyer_age?: number;
+  buying_with?: string;
+  cobuyer_relationship?: string;
+  // Section 2
+  income_type?: string;
+  self_employed_2yr?: string;
+  job_change_2yr?: string;
+  cobuyer_income?: number;
+  // Section 3
+  large_expenses?: string;
+  // Section 4
+  cobuyer_credit_score?: number;
+  credit_dings?: string;
+  // Section 5
+  target_state?: string;
   purchase_timeline: string;
-  target_location: string;
-  location_familiarity: string;
-  household_size: number;
-  current_housing: string;
+  life_events?: string;
+  // Section 6
+  main_motivation?: string[];
+  equity_vs_payment?: string;
+  stay_length?: string;
+  starter_vs_longterm?: string;
+  house_hacking?: string;
+  // Section 7
+  property_type?: string;
+  bedrooms?: string;
+  renovation?: string;
+  target_location?: string;
+  geo_constraints?: string;
+  school_district?: string;
+  neighborhood_feel?: string;
+  // Section 8
+  cobuyer_alignment?: string;
+  fears?: string[];
+  mortgage_familiarity?: string;
+  has_agent?: string;
+  current_housing?: string;
+  process_questions?: string;
+  // Section 9
+  special_situations?: string[];
 }
 
 export interface SurveyInputs {

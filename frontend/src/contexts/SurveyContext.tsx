@@ -54,10 +54,11 @@ function buildStepsFromPlan(planSteps: AiPlanStep[]): StepData[] {
 function getBuyerTypeFromTimeline(purchaseTimeline: string): string {
   const t = (purchaseTimeline || "").toLowerCase();
   if (!t) return "Explorer";
-  if (t.includes("within 3 months")) return "Ready Buyer";
-  if (t.includes("within 6 months")) return "Searcher";
+  if (t.includes("asap")) return "Ready Buyer";
+  if (t.includes("3") && t.includes("6")) return "Searcher";
   if (t.includes("6") && t.includes("12")) return "Planner";
   if (t.includes("1") && t.includes("2")) return "Planner";
+  if (t.includes("exploring")) return "Explorer";
   return "Explorer";
 }
 
