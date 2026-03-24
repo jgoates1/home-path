@@ -326,7 +326,8 @@ function buildModel() {
     generationConfig: {
       responseMimeType: 'application/json',
       responseSchema: planSchema as any,
-    },
+      thinkingConfig: { thinkingBudget: 10000 },
+    } as any,
     systemInstruction: SYSTEM_PROMPT,
   });
 }
