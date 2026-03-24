@@ -238,7 +238,9 @@ const SurveyPage = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="h-screen flex flex-col bg-background md:h-auto md:min-h-screen md:items-center md:px-6 md:py-8">
+      <div className="flex-1 flex flex-col w-full md:flex-none md:max-w-md md:h-[75vh] md:border md:rounded-2xl md:shadow-lg md:overflow-hidden md:bg-card">
+
       {/* Progress bar */}
       <div className="w-full h-1 bg-muted shrink-0">
         <div
@@ -384,6 +386,8 @@ const SurveyPage = () => {
           </button>
         </div>
       )}
+
+      </div>
     </div>
   );
 };
