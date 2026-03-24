@@ -322,11 +322,10 @@ function buildModel() {
   }
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
   return genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.0-flash',
     generationConfig: {
       responseMimeType: 'application/json',
       responseSchema: planSchema as any,
-      thinkingConfig: { thinkingBudget: 10000 },
     } as any,
     systemInstruction: SYSTEM_PROMPT,
   });
