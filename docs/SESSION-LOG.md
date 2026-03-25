@@ -2,6 +2,62 @@
 
 ---
 
+## 2026-03-25
+
+**What was done:**
+- Diagnosed 502 error on `POST /api/surveys/generate-plan` — Gemini API key in Vercel had spending cap set to $0
+- Switched model from `gemini-2.0-flash` (deprecated for new keys, returns 404) to `gemini-2.5-flash`
+- Updated `GEMINI_API_KEY` in Vercel production environment to working key
+- Confirmed plan generation works end-to-end in production
+
+**Files changed:**
+- `server/routes/surveys.ts` — model changed to `gemini-2.5-flash`
+
+**Decisions made:**
+- Use `gemini-2.5-flash` — 2.0 models return 404 for new API keys
+- Gemini API key in Vercel must match a key with no spending cap (or sufficient cap)
+
+**Next steps:**
+- Confirm new DB schema has been run against Supabase (outstanding — not done this session)
+- Monitor Gemini API usage/costs on 2.5-flash
+
+---
+
+## 2026-03-24
+
+### What was done
+- Built full 9-section chat-style survey UI (`SurveyPage.tsx`) — bot/user bubbles, typing indicator, adaptive input tray, conditional questions, multiselect chips
+- Replaced Gemini system prompt with full `plan-generator-context.md` content
+- Updated Gemini schema: `step_number`, `step_goal_date`, todos as objects, `recommended_loan_type`
+- Expanded `SurveyInputs` / `SurveyContext` types for all 9 survey sections
+- Fixed GitHub Actions deploy workflow (checkout + Vercel CLI instead of API call)
+- Created `db/migration_cleanup.sql` (drop 5 old tables, ensure 4 AI tables) and `db/migration_refresh.sql` (add new columns)
+- Set Gemini thinking budget to 10,000 tokens (was 0, then dynamic — caused 1M token/min rate limit spike)
+- Diagnosed 403 on `/api/surveys/generate-plan` — was stale token from old deployment, resolved after fresh login
+
+### Files changed
+- `server/routes/surveys.ts`
+- `frontend/src/pages/SurveyPage.tsx`
+- `frontend/src/types/plan.ts`
+- `frontend/src/contexts/SurveyContext.tsx`
+- `frontend/src/contexts/AuthContext.tsx`
+- `.github/workflows/deploy.yml`
+- `db/migration_cleanup.sql` (new)
+- `db/migration_refresh.sql` (new)
+- `plans/2026-03-24-survey-frontend.md` (new)
+
+### Decisions made
+- Chat UI over form: less intimidating, guides users question by question
+- `thinkingBudget: 10000`: allows reasoning without hitting rate limits
+- Force-pushed main to overwrite buggy remote commits
+
+### Next steps
+- Run `migration_cleanup.sql` and `migration_refresh.sql` in Supabase if not yet applied
+- Desktop layout polish (centered card, input 25% above bottom) — user said it looks good as-is
+- Monitor Gemini token usage in AI Studio
+
+---
+
 ## 2026-03-16
 
 ### What was done

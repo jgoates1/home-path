@@ -12,7 +12,7 @@ Set in Vercel project → Settings → Environment Variables.
 | `DB_USER` | Database user |
 | `DB_PASSWORD` | Database password |
 | `JWT_SECRET` | JWT signing secret |
-| `GEMINI_API_KEY` | Google Gemini API key (to be added) |
+| `GEMINI_API_KEY` | Google Gemini API key (active — gemini-2.5-flash) |
 
 ### Local dev (`.env.local` — gitignored)
 Each developer needs their own copy with the same variables.
