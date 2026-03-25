@@ -2,6 +2,26 @@
 
 ---
 
+## 2026-03-25 (session 2)
+
+**What was done:**
+- Updated all `docs/` files to reflect completed Gemini 2.5-flash integration (CONTEXT, DECISIONS, SETUP, SESSION-LOG)
+- Consolidated 5 stale db files into a single `db/migrate.sql` — idempotent, drops old tables, ensures all AI tables, backfills missing columns
+- Updated `db/setup.sh`, `db/reset.sh`, and `db/README.md` to use `migrate.sql`
+- Both changesets pushed to main (auto-deploys to Vercel)
+
+**Files changed:**
+- `docs/CONTEXT.md`, `docs/DECISIONS.md`, `docs/SETUP.md`, `docs/SESSION-LOG.md`
+- `db/migrate.sql` (new)
+- `db/README.md`, `db/setup.sh`, `db/reset.sh`
+- Deleted: `db/schema.sql`, `db/seed.sql`, `db/migration_gemini.sql`, `db/migration_cleanup.sql`, `db/migration_refresh.sql`
+
+**Next steps:**
+- Teammates run `psql -d homepath_db -f db/migrate.sql` to sync local DB
+- Run `migrate.sql` against Supabase production if not yet done
+
+---
+
 ## 2026-03-25
 
 **What was done:**
