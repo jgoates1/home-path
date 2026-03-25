@@ -1,155 +1,49 @@
-# Database Setup Guide
+# Database
 
-This guide will help you set up a local PostgreSQL database for your application.
+## Schema
 
-## Prerequisites
+| Table | Purpose |
+|---|---|
+| `user_info` | User accounts (login, email, archetype) |
+| `user_financial_profile` | Survey answers and financial inputs |
+| `user_plan_metrics` | AI-generated plan numbers and goal dates |
+| `ai_tips` | Plan tips per step |
+| `ai_todos` | Todos per step |
 
-### 1. Install PostgreSQL
+## Setup (fresh local database)
 
-**macOS (using Homebrew):**
-```sh
-brew install postgresql@16
-brew services start postgresql@16
-```
-
-**Or use Postgres.app:**
-- Download from https://postgresapp.com/
-- Launch Postgres.app and initialize
-
-**Verify installation:**
-```sh
-psql --version
-```
-
-## Quick Setup
-
-### Option 1: Automated Setup (Recommended)
-
-Run the setup script:
 ```sh
 npm run db:setup
 ```
 
-This will:
-- Create the database
-- Run schema migrations
-- Seed with sample data
+Or manually:
 
-### Option 2: Manual Setup
-
-1. **Create the database:**
 ```sh
 createdb homepath_db
+psql -d homepath_db -f db/migrate.sql
 ```
 
-2. **Run the schema:**
+## Existing database (teammates)
+
+If you already have `homepath_db` locally, just run the migration to drop old tables and add any missing columns:
+
 ```sh
-psql -d homepath_db -f db/schema.sql
+psql -d homepath_db -f db/migrate.sql
 ```
 
-3. **Seed the database:**
-```sh
-psql -d homepath_db -f db/seed.sql
-```
+Safe to run multiple times — everything is `IF NOT EXISTS` / `IF EXISTS`.
 
-## Database Commands
+## Reset
 
 ```sh
-# Connect to the database
-psql homepath_db
-
-# Reset database (drops and recreates)
 npm run db:reset
-
-# Run only schema
-psql -d homepath_db -f db/schema.sql
-
-# Run only seeds
-psql -d homepath_db -f db/seed.sql
-
-# Backup database
-pg_dump homepath_db > db/backup.sql
-
-# Restore from backup
-psql -d homepath_db -f db/backup.sql
 ```
 
-## Database Connection Info
+## Connection
 
-- **Database Name:** `homepath_db`
+- **Database:** `homepath_db`
 - **Host:** `localhost`
-- **Port:** `5432` (default)
-- **User:** Your system username
-- **Password:** (none for local development)
+- **Port:** `5432`
+- **URL:** `postgresql://localhost:5432/homepath_db`
 
-## Connection String
-
-```
-postgresql://localhost:5432/homepath_db
-```
-
-## Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-DATABASE_URL=postgresql://localhost:5432/homepath_db
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=homepath_db
-DB_USER=your_username
-DB_PASSWORD=
-```
-
-## Useful psql Commands
-
-Once connected to the database (`psql homepath_db`):
-
-```sql
--- List all tables
-\dt
-
--- Describe a table
-\d user_info
-
--- View all users
-SELECT * FROM user_info;
-
--- View all survey questions
-SELECT * FROM survey_questions;
-
--- Quit psql
-\q
-```
-
-## Troubleshooting
-
-### "Database does not exist" error
-```sh
-createdb homepath_db
-```
-
-### "Permission denied" error
-```sh
-# Check if PostgreSQL is running
-brew services list | grep postgresql
-
-# Start PostgreSQL
-brew services start postgresql@16
-```
-
-### "psql: command not found"
-Add PostgreSQL to your PATH:
-```sh
-echo 'export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
-```
-
-## Database Schema Overview
-
-- **user_info** - User accounts and profiles
-- **survey_questions** - Survey question templates
-- **user_responses** - User answers to survey questions
-- **todo_items** - Master list of todo items
-- **steps** - User's journey steps
-- **user_todos** - User-specific todo assignments
+`.env.local` variables: `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`

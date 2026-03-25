@@ -42,26 +42,16 @@ echo "Creating database '$DB_NAME'..."
 createdb "$DB_NAME"
 echo "✓ Database created"
 
-# Run schema
+# Run migration
 echo ""
-echo "Running schema migrations..."
-psql -d "$DB_NAME" -f "$SCRIPT_DIR/schema.sql" > /dev/null
+echo "Running migration..."
+psql -d "$DB_NAME" -f "$SCRIPT_DIR/migrate.sql" > /dev/null
 echo "✓ Schema created"
-
-# Run seeds
-echo ""
-echo "Seeding database..."
-psql -d "$DB_NAME" -f "$SCRIPT_DIR/seed.sql" > /dev/null
-echo "✓ Data seeded"
 
 # Verify setup
 echo ""
 echo "Verifying setup..."
 TABLES=$(psql -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public';")
-USERS=$(psql -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM user_info;")
-
-echo "  Tables created: $TABLES"
-echo "  Sample users: $USERS"
 
 echo ""
 echo "✅ Database setup complete!"

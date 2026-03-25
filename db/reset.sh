@@ -20,13 +20,9 @@ fi
 createdb "$DB_NAME"
 echo "✓ Database created"
 
-# Run schema
-psql -d "$DB_NAME" -f "$SCRIPT_DIR/schema.sql" > /dev/null
+# Run migration
+psql -d "$DB_NAME" -f "$SCRIPT_DIR/migrate.sql" > /dev/null
 echo "✓ Schema created"
-
-# Run seeds
-psql -d "$DB_NAME" -f "$SCRIPT_DIR/seed.sql" > /dev/null
-echo "✓ Data seeded"
 
 echo ""
 echo "✅ Database reset complete!"
