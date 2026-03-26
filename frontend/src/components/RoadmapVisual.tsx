@@ -26,7 +26,7 @@ const RoadmapVisual = () => {
     } catch {
       // Fail silently if path metrics are unavailable
     }
-  }, []);
+  }, [steps.length]);
 
   const dashLength = pathLength || 1;
   const progressOffset = dashLength * (1 - progressFraction);
@@ -206,7 +206,7 @@ const RoadmapVisual = () => {
                 <span className="text-lg font-bold">{step.id}</span>
               )}
             </div>
-            <span className="text-[0.7rem] font-semibold text-center max-w-[110px] leading-snug text-white">
+            <span className="text-[0.7rem] font-semibold text-center max-w-[110px] leading-snug text-foreground">
               {step.title === "Find Your Home" ? (
                 <>
                   Find Your

@@ -14,8 +14,8 @@ Set in Vercel project → Settings → Environment Variables.
 | `JWT_SECRET` | JWT signing secret |
 | `GEMINI_API_KEY` | Google Gemini API key (active — gemini-2.5-flash) |
 
-### Local dev (`.env.local` — gitignored)
-Each developer needs their own copy with the same variables.
+### Local dev (`.env` at repo root — gitignored)
+`dotenv` loads `.env` for the Express server. The Vite app uses same-origin `/api` in development (proxied to `http://127.0.0.1:3001`), so you usually do **not** need `VITE_API_URL` unless you have a special setup.
 
 ## Dev Commands
 
@@ -23,13 +23,20 @@ Each developer needs their own copy with the same variables.
 # Install dependencies
 npm install
 
-# Run frontend (Vite dev server)
-cd frontend && npm run dev
+# Run frontend + backend together (recommended)
+npm run dev
 
-# Run backend (Express)
-npm run server
+# Or run each terminal separately:
+npm run dev:backend   # Express on http://localhost:3001
+# In another terminal — from repo root, with cwd frontend for Vite:
+cd frontend && npx vite
+```
 
-# Build
+The frontend calls **`/api/...`**. In dev, Vite proxies those requests to the backend. **If you see “Failed to fetch”, start the backend** (`npm run dev:backend` or `npm run dev`) and reload the page.
+
+## Build
+
+```bash
 npm run build
 ```
 

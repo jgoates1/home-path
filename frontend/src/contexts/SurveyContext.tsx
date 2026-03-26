@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from "react";
 import { api } from "@/services/api";
 import { PlanMetrics, AiPlanStep, SurveyInputs } from "@/types/plan";
 
@@ -23,6 +23,8 @@ interface SurveyContextType {
   buyerType: string;
   planMetrics: PlanMetrics | null;
   steps: StepData[];
+  /** Highest step order the user may open (1 = only step 1; advances when prior step's todos are done). Drives roadmap path + locks. */
+  currentStep: number;
   committedTimeline: string;
   setCommittedTimeline: (t: string) => void;
   savedAmount: number;
@@ -51,6 +53,22 @@ function buildStepsFromPlan(planSteps: AiPlanStep[]): StepData[] {
   }));
 }
 
+/** Step 1 always unlocked; step k+1 unlocks when all todos on step k are complete. Drives RoadmapVisual locks and path progress. */
+export function computeRoadmapCurrentStep(steps: StepData[]): number {
+  if (steps.length === 0) return 0;
+  const ordered = [...steps].sort((a, b) => a.id - b.id);
+  const maxStepId = Math.max(...ordered.map((s) => s.id));
+  let n = 1;
+  for (const step of ordered) {
+    const stepComplete =
+      step.todos.length > 0 && step.todos.every((t) => t.completed);
+    if (step.id <= n && stepComplete) {
+      n = Math.min(step.id + 1, maxStepId);
+    }
+  }
+  return n;
+}
+
 function getBuyerTypeFromTimeline(purchaseTimeline: string): string {
   const t = (purchaseTimeline || "").toLowerCase();
   if (!t) return "Explorer";
@@ -74,6 +92,8 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
   const [committedTimeline, setCommittedTimelineState] = useState("");
   const [savedAmount, setSavedAmountState] = useState(0);
   const [targetSavings, setTargetSavings] = useState(50000);
+
+  const currentStep = useMemo(() => computeRoadmapCurrentStep(steps), [steps]);
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
@@ -190,7 +210,7 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
       value={{
         hasPlan, isGenerating, generateError,
         buyerType,
-        planMetrics, steps,
+        planMetrics, steps, currentStep,
         committedTimeline, setCommittedTimeline,
         savedAmount, targetSavings, setSavedAmount,
         submitSurvey, toggleTodo,

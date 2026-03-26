@@ -1,4 +1,7 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+// In dev, prefer same-origin `/api` so Vite can proxy to the Express server (avoids "Failed to fetch"
+// when the UI is opened via 127.0.0.1 or a LAN IP — `localhost:3001` would target the wrong host).
+// Production on Vercel also serves `/api` via rewrites. Override with VITE_API_URL when needed.
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 interface LoginResponse {
   message: string;
@@ -21,7 +24,8 @@ interface RegisterData {
 }
 
 interface ApiError {
-  error: string;
+  error?: string;
+  message?: string;
 }
 
 class ApiService {
@@ -35,8 +39,17 @@ class ApiService {
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const resp = await fetch(input, { ...init, signal: controller.signal });
-      return resp;
+      return await fetch(input, { ...init, signal: controller.signal });
+    } catch (e) {
+      if (e instanceof TypeError) {
+        throw new Error(
+          'Cannot reach the API. For local dev, run `npm run dev` or `npm run dev:backend` from the project root, then reload.',
+        );
+      }
+      if (e instanceof DOMException && e.name === 'AbortError') {
+        throw new Error('Request timed out. Check your connection and try again.');
+      }
+      throw e;
     } finally {
       window.clearTimeout(timer);
     }
@@ -48,14 +61,44 @@ class ApiService {
   }
 
   private async handleResponse<T>(response: Response): Promise<T> {
+    const text = await response.text();
+
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         this.clearAuth();
       }
-      const error: ApiError = await response.json().catch(() => ({ error: 'Network error' }));
-      throw new Error(error.error || 'Something went wrong');
+      let apiMessage: string | undefined;
+      if (text) {
+        try {
+          const body = JSON.parse(text) as ApiError;
+          apiMessage = body.error || body.message;
+        } catch {
+          /* body is HTML or plain text */
+        }
+      }
+      if (apiMessage) {
+        throw new Error(apiMessage);
+      }
+      if (response.status === 502 || response.status === 503) {
+        throw new Error(
+          `API unavailable (${response.status}). If developing locally, ensure the backend is running on port 3001.`,
+        );
+      }
+      throw new Error(
+        text
+          ? `Request failed (${response.status}). The server returned a non-JSON response (often a proxy or HTML error page).`
+          : `Request failed (${response.status} ${response.statusText || ''}).`.trim(),
+      );
     }
-    return response.json();
+
+    if (!text) {
+      return undefined as T;
+    }
+    try {
+      return JSON.parse(text) as T;
+    } catch {
+      throw new Error('Invalid JSON from server.');
+    }
   }
 
   // Authentication
