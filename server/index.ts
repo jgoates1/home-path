@@ -6,6 +6,7 @@ import userRoutes from './routes/users.js';
 import surveyRoutes from './routes/surveys.js';
 import todoRoutes from './routes/todos.js';
 import stepsRoutes from './routes/steps.js';
+import adminRoutes from './routes/admin.js';
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +31,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/surveys', surveyRoutes);
 app.use('/api/todos', todoRoutes);
 app.use('/api/steps', stepsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // API root endpoint
 app.get('/api', (req: Request, res: Response) => {
@@ -47,7 +49,8 @@ app.get('/api', (req: Request, res: Response) => {
       },
       surveys: 'GET /api/surveys',
       todos: 'GET /api/todos',
-      steps: 'GET /api/steps'
+      steps: 'GET /api/steps',
+      admin: 'GET /api/admin/login-activity (admin only)'
     },
     documentation: 'See server/README.md for full API reference'
   });
@@ -69,6 +72,7 @@ app.get('/', (req: Request, res: Response) => {
       surveys: '/api/surveys',
       todos: '/api/todos',
       steps: '/api/steps',
+      admin: '/api/admin',
       health: '/health'
     }
   });

@@ -7,6 +7,7 @@ interface User {
   email: string;
   username: string;
   archetype: string | null;
+  adminFlag?: boolean;
 }
 
 interface LoginResult {
@@ -55,6 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             email: profile.email,
             username: profile.username,
             archetype: profile.archetype,
+            adminFlag: Boolean(profile.adminFlag),
           };
           setUser(normalized);
           localStorage.setItem("auth_user", JSON.stringify(normalized));
@@ -86,6 +88,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: response.user.email,
         username: response.user.username,
         archetype: response.user.archetype,
+        adminFlag: Boolean(response.user.adminFlag),
       };
 
       setUser(userData);
@@ -132,6 +135,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: response.user.email,
         username: response.user.username,
         archetype: response.user.archetype,
+        adminFlag: Boolean(response.user.adminFlag),
       };
 
       setUser(userData);
