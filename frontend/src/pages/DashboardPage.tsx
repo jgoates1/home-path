@@ -18,7 +18,7 @@ const fmtPct = (n: number) => `${Math.round(n * 100)}%`;
 
 const DashboardPage = () => {
   const { user } = useAuth();
-  const { savedAmount, targetSavings, setSavedAmount, planMetrics, getCompletionPercent, steps, hasPlan } = useSurvey();
+  const { savedAmount, targetSavings, setSavedAmount, planMetrics, getCompletionPercent, steps, hasPlan, toggleTodo } = useSurvey();
   const navigate = useNavigate();
   const completionPct = getCompletionPercent();
   const [modalOpen, setModalOpen] = useState(false);
@@ -155,7 +155,15 @@ const DashboardPage = () => {
                 className="flex items-start gap-3 p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer"
                 onClick={() => navigate(`/step/${todo.stepId}`)}
               >
-                <div className="w-4 h-4 rounded-sm border-2 border-muted-foreground/50 mt-0.5 shrink-0" />
+                <button
+                  type="button"
+                  aria-label={`Mark ${todo.text} complete`}
+                  className="w-4 h-4 rounded-sm border-2 border-muted-foreground/50 mt-0.5 shrink-0 hover:border-primary transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    void toggleTodo(todo.stepId, todo.id);
+                  }}
+                />
                 <div>
                   <span className="text-sm font-medium text-foreground">{todo.text}</span>
                   <span className="block text-xs text-muted-foreground">{todo.stepTitle}</span>
