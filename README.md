@@ -2,7 +2,9 @@
 
 ## App Summary
 
-HomePath is a full-stack web application that helps people plan and track their path to homeownership. The problem it addresses is that buying a first home is complex and overwhelming: users often don’t know where to start, what steps to take, or how to track progress. The primary users are first-time or prospective home buyers who want a guided, personalized journey. The product provides a survey to capture the user’s situation and preferences, then generates a customized set of steps and todos. Users can view a timeline, manage tasks, see survey results and insights, and update their profile—all persisted in a database so progress is saved across sessions.
+HomePath is a full-stack web application that helps people plan and track their path to homeownership. The problem it addresses is that buying a first home is complex and overwhelming: users often don’t know where to start, what steps to take, or how to track progress. The primary users are first-time or prospective home buyers who want a guided, personalized journey.
+
+The app features an **AI-powered personalized planning system**: users complete an interactive chat-based survey (80+ questions across 9 sections covering finances, goals, and preferences), and the **Google Gemini API** analyzes their situation to generate a customized 4-step homebuying roadmap. Each plan includes detailed financial analysis (loan type recommendations, down payment calculations, savings gap, debt-to-income ratio), personalized tips, and actionable todos. The dashboard features a visual roadmap with progressive unlocking—each step unlocks only when the previous step’s todos are complete. Users can track savings progress, manage tasks, and view their financial metrics—all persisted in a database so progress is saved across sessions.
 
 ## Table of Contents
 
@@ -31,7 +33,7 @@ Technologies by layer:
 - **Backend framework:** Express, TypeScript, Node.js
 - **Database:** PostgreSQL (database name: `homepath_db`); `pg` client in the server
 - **Authentication:** JWT (jsonwebtoken) for API auth; bcrypt for password hashing; protected routes require `Authorization: Bearer <token>`
-- **External services or APIs:** None; the app uses only the frontend, backend, and database above.
+- **External services or APIs:** Google Gemini API (gemini-2.5-flash model) for AI-powered personalized homebuying plan generation, including financial analysis, step recommendations, tips, and actionable todos
 
 ## Architecture Diagram
 
@@ -41,11 +43,14 @@ flowchart LR
   Browser[Browser / Frontend]
   API[Backend API]
   DB[(PostgreSQL)]
+  Gemini[Google Gemini API]
 
   User -->|"Uses"| Browser
   Browser -->|"HTTP/REST"| API
   API -->|"SQL"| DB
   DB -->|"Results"| API
+  API -->|"AI Plan Generation"| Gemini
+  Gemini -->|"Personalized Plan JSON"| API
   API -->|"JSON"| Browser
   Browser -->|"Renders UI"| User
 ```
@@ -55,17 +60,18 @@ The live website is deployed at [home-path.vercel.app](https://home-path.vercel.
 - The **user** interacts with the app in the **browser** (frontend at http://localhost:5173).
 - The **frontend** sends HTTP requests to the **backend API** (http://localhost:3001/api).
 - The **backend** runs SQL against **PostgreSQL** and returns JSON.
-- No external third-party services are used.
+- The **backend** calls **Google Gemini API** to generate AI-powered personalized homebuying plans based on survey responses.
 
 ## Prerequisites
 
 Install the following and ensure they are available in your system PATH:
 
-| Software           | Purpose                              | Install                                                                         | Verify                 |
-| ------------------ | ------------------------------------ | ------------------------------------------------------------------------------- | ---------------------- |
-| **Node.js** (v18+) | Runtime for frontend and backend     | [Official install](https://nodejs.org/) or [nvm](https://github.com/nvm-sh/nvm) | `node -v` and `npm -v` |
-| **PostgreSQL**     | Database                             | [Official install](https://www.postgresql.org/download/)                        | `psql --version`       |
-| **psql**           | CLI to create DB and run schema/seed | Included with PostgreSQL; must be in PATH                                       | `psql --version`       |
+| Software                  | Purpose                              | Install                                                                         | Verify                                |
+| ------------------------- | ------------------------------------ | ------------------------------------------------------------------------------- | ------------------------------------- |
+| **Node.js** (v18+)        | Runtime for frontend and backend     | [Official install](https://nodejs.org/) or [nvm](https://github.com/nvm-sh/nvm) | `node -v` and `npm -v`                |
+| **PostgreSQL**            | Database                             | [Official install](https://www.postgresql.org/download/)                        | `psql --version`                      |
+| **psql**                  | CLI to create DB and run schema/seed | Included with PostgreSQL; must be in PATH                                       | `psql --version`                      |
+| **Google Gemini API Key** | AI-powered plan generation           | Get free key at https://aistudio.google.com/app/apikey                          | Check `.env` has `GEMINI_API_KEY` set |
 
 On **Windows**, the `db/` scripts are Bash-based. Use [WSL](https://docs.microsoft.com/en-us/windows/wsl/) or follow manual steps in [db/README.md](db/README.md).
 
@@ -76,7 +82,7 @@ git https://github.com/jgoates1/home-path.git
 cd home-path
 npm install
 cp .env.example .env
-# Edit .env: set DB_USER, DB_PASSWORD, and JWT_SECRET
+# Edit .env: set DB_USER, DB_PASSWORD, JWT_SECRET, and GEMINI_API_KEY
 npm run db:setup
 npm run dev
 ```
@@ -98,6 +104,15 @@ npm run dev
    - Copy `.env.example` to `.env`
    - Set database credentials: `DB_USER`, `DB_PASSWORD` (or use `DATABASE_URL`)
    - Set `JWT_SECRET` for authentication (use a long, random string in production)
+   - **Set `GEMINI_API_KEY` for AI plan generation (required)**:
+     1. Visit https://aistudio.google.com/app/apikey
+     2. Sign in with your Google account
+     3. Click **"Create API Key"** (or use an existing project)
+     4. Copy the generated API key
+     5. Paste into `.env` as `GEMINI_API_KEY=your_key_here`
+
+     ⚠️ **Important**: Without this key, the survey will complete but plan generation will fail with a 500 error.
+
    - Optional: `PORT` (backend defaults to 3001 if unset)
 
 3. **Create the database and load schema and seed data**
@@ -130,6 +145,102 @@ npm run dev
    **http://localhost:5173**
 
    The backend API is at http://localhost:3001 (e.g. http://localhost:3001/api for REST endpoints).
+
+## How It Works
+
+HomePath guides first-time homebuyers through a personalized journey powered by AI. Here's how the app works:
+
+### 1. Interactive Survey (Chat Interface)
+
+After creating an account, users complete an interactive chat-based survey that collects comprehensive information about their situation:
+
+- **9 Question Sections**:
+  1. **About You**: Age, buying solo or with a partner, relationship status
+  2. **Your Income**: Annual income, income type (salaried, self-employed, etc.), job stability
+  3. **Your Finances**: Current savings, total assets, upcoming large expenses
+  4. **Credit & Debt**: Credit score range, credit issues, monthly debt payments
+  5. **Budget & Timeline**: Target home price, target state, purchase timeline
+  6. **Your Goals**: Motivations, equity vs. payment priorities, how long they plan to stay, house hacking interest
+  7. **The Home**: Property type, bedrooms, renovation willingness, target location, school district importance
+  8. **Mindset & Readiness**: Concerns/fears, mortgage familiarity, real estate agent status
+  9. **Special Situations**: Veteran status, public servant, rural area, prior foreclosure/bankruptcy
+
+- **Smart Question Flow**:
+  - Questions appear one at a time in a chat-like interface
+  - Conditional logic shows/hides questions based on previous answers (e.g., co-buyer questions only appear if buying with someone)
+  - Progress bar shows completion percentage
+  - Takes approximately 3-4 minutes to complete
+
+### 2. AI-Powered Plan Generation
+
+When the survey is submitted, the backend sends the user's responses to the **Google Gemini API (gemini-2.5-flash model)** with a comprehensive 800+ line system prompt that includes:
+
+- Homebuying best practices and guidelines
+- Mortgage basics (FHA, VA, USDA, conventional loans)
+- Down payment rules based on credit score
+- Debt-to-income (DTI) ratio calculations
+- Closing cost estimates and cash reserve recommendations
+- State-specific program guidance
+
+**The AI analyzes the user's situation and generates**:
+
+- **Financial Metrics** (8 calculations):
+  - Recommended loan type (FHA, VA, USDA, or conventional with specific down payment %)
+  - Down payment amount and percentage
+  - Closing cost estimate
+  - Total cash needed
+  - Savings gap (how much more they need to save)
+  - Monthly savings target
+  - Months to goal
+  - Estimated monthly mortgage payment
+  - Debt-to-income ratio
+
+- **4-Step Personalized Roadmap**:
+  1. **Get Your Finances Ready**
+  2. **Get Pre-Approved**
+  3. **Find Your Home**
+  4. **Close the Deal**
+
+  Each step includes:
+  - Goal date (based on their purchase timeline)
+  - 4 personalized tips (referencing their actual dollar amounts, location, and concerns)
+  - 4 actionable todos (specific to their situation)
+
+All plan data is stored in the database so it persists across sessions.
+
+### 3. Dashboard & Progress Tracking
+
+After plan generation, users land on their personalized dashboard featuring:
+
+- **Visual Roadmap**: Animated SVG path showing their journey through the 4 steps
+  - Steps are progressively unlocked: Step 1 is always available, but Step 2 only unlocks when all Step 1 todos are complete, and so on
+  - Visual indicators show locked, active, and completed steps
+  - Confetti celebration when all steps are complete
+
+- **Savings Tracker**:
+  - Shows current savings vs. total cash needed (down payment + closing costs)
+  - Editable savings amount that updates the database
+  - Progress bar with percentage
+
+- **Financial Snapshot**: Displays all 8 financial metrics at a glance
+
+- **Up Next**: Shows the top 5 incomplete todos across all steps
+
+### 4. Step Detail Pages
+
+Clicking on an unlocked step takes users to a detail page showing:
+
+- Step-specific tips from the AI
+- Todos with checkboxes (completion status persists to database)
+- Goal date for completing the step
+
+### Key Features
+
+- **Personalization**: All tips and todos reference the user's actual numbers (income, savings, target price, location, timeline)
+- **Smart Recommendations**: Loan type varies by credit score, veteran status, rural location, etc.
+- **Reality Check**: AI warns if timeline is unrealistic or DTI exceeds safe thresholds
+- **Trusted Resources**: Tips include links to CFPB, HUD, VA, USDA, Zillow, Bankrate, and educational YouTube searches
+- **Progress Persistence**: All user data (survey answers, plan, todo completion, savings) is saved to PostgreSQL
 
 ## Verifying the Vertical Slice
 
@@ -202,43 +313,63 @@ For the full directory layout, see [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md).
 
 ## Application Routes
 
-| Path               | Description       | Protected |
-| ------------------ | ----------------- | --------- |
-| `/`                | Home              | No        |
-| `/login`           | Login             | No        |
-| `/create-account`  | Registration      | No        |
-| `/about`           | About             | Yes       |
-| `/survey`          | Survey            | Yes       |
-| `/results`         | Survey results    | Yes       |
-| `/timeline`        | Timeline / commit | Yes       |
-| `/dashboard`       | Dashboard         | Yes       |
-| `/step/:stepId`    | Step detail       | Yes       |
-| `/profile`         | User profile      | Yes       |
-| `/survey-insights` | Survey insights   | Yes       |
-| `*`                | 404 Not Found     | No        |
+| Path               | Description                                   | Protected |
+| ------------------ | --------------------------------------------- | --------- |
+| `/`                | Home                                          | No        |
+| `/login`           | Login                                         | No        |
+| `/create-account`  | Registration                                  | No        |
+| `/about`           | About                                         | Yes       |
+| `/survey`          | Interactive chat-based survey (80+ questions) | Yes       |
+| `/plan-loading`    | AI plan generation in progress                | Yes       |
+| `/results`         | Buyer archetype & personalized tips           | Yes       |
+| `/timeline`        | Timeline commitment                           | Yes       |
+| `/dashboard`       | Main hub with roadmap & progress tracking     | Yes       |
+| `/step/:stepId`    | Step detail with tips and todos               | Yes       |
+| `/profile`         | User profile                                  | Yes       |
+| `/survey-insights` | Financial snapshot                            | Yes       |
+| `*`                | 404 Not Found                                 | No        |
 
 ## Configuration
 
 Environment variables are read from `.env`. Use `.env.example` as a template. Key variables:
 
-| Variable       | Description                                                                           |
-| -------------- | ------------------------------------------------------------------------------------- |
-| `DATABASE_URL` | Full PostgreSQL URL, or use `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` |
-| `PORT`         | Backend server port (default: 3001)                                                   |
-| `JWT_SECRET`   | Secret for signing JWT tokens (required for auth)                                     |
-| `NODE_ENV`     | `development` or `production`                                                         |
+| Variable         | Description                                                                                                     |
+| ---------------- | --------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`   | Full PostgreSQL URL, or use `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`                           |
+| `PORT`           | Backend server port (default: 3001)                                                                             |
+| `JWT_SECRET`     | Secret for signing JWT tokens (required for auth)                                                               |
+| `GEMINI_API_KEY` | Google Gemini API key for AI plan generation (required). Get free key at https://aistudio.google.com/app/apikey |
+| `NODE_ENV`       | `development` or `production`                                                                                   |
 
 See [SETUP.md](SETUP.md) and `.env.example` for more detail.
 
 ## API
 
-The backend exposes a REST API at **http://localhost:3001/api**. Main groups:
+The backend exposes a REST API at **http://localhost:3001/api**. Main endpoints:
 
-- **Auth:** `POST /api/auth/register`, `POST /api/auth/login`
-- **Users:** `GET /api/users/me`, `PUT /api/users/me`
-- **Surveys:** questions and responses
-- **Todos:** user todo items
-- **Steps:** user journey steps
+- **Auth:**
+  - `POST /api/auth/register` - Create new account
+  - `POST /api/auth/login` - Login and receive JWT token
+
+- **Users:**
+  - `GET /api/users/me` - Get current user profile
+  - `PUT /api/users/me` - Update user profile
+  - `PUT /api/users/savings` - Update current savings amount
+
+- **Surveys & Plans:**
+  - `POST /api/surveys/generate-plan` - Generate AI-powered homebuying plan from survey responses
+  - `GET /api/surveys/plan` - Fetch user's existing plan with financial metrics and steps
+
+- **Todos:**
+  - `PUT /api/todos/ai/{todoId}` - Toggle AI-generated todo completion status
+
+- **Steps:**
+  - `GET /api/steps` - Get all steps for user
+  - `GET /api/steps/{stepId}` - Get specific step details
+  - `POST /api/steps` - Create custom step
+  - `PUT /api/steps/{stepId}` - Update step
+  - `DELETE /api/steps/{stepId}` - Delete step
+  - `GET /api/steps/{stepId}/todos` - Get todos for a step
 
 Most endpoints require a JWT in the `Authorization: Bearer <token>` header. Full reference: [server/README.md](server/README.md).
 
@@ -251,6 +382,11 @@ Most endpoints require a JWT in the `Authorization: Bearer <token>` header. Full
 
 - **Backend won’t start:** Ensure PostgreSQL is running and that port 3001 is free (e.g. `lsof -i :3001` on macOS/Linux; on Windows, check Task Manager or `netstat`).
 - **Database errors:** Run `npm run db:reset` where supported, or reset manually (see [db/README.md](db/README.md)). Verify connection with `psql homepath_db`.
+- **Gemini API errors:**
+  - If you see "Gemini is not configured" or plan generation fails with a 500 error, verify `GEMINI_API_KEY` is set in your `.env` file.
+  - Check that your API key is valid at https://aistudio.google.com/app/apikey
+  - The free tier has rate limits; if you hit them, wait a few minutes or upgrade to a paid tier.
+  - Ensure the `@google/generative-ai` package is installed (`npm install` should handle this).
 - **CORS errors:** Ensure the backend allows your frontend origin; see `FRONTEND_URL` in docs and server config.
 - **Auth errors:** Use the `Authorization: Bearer <token>` header; tokens expire (e.g. after 24 hours).
 - **Windows:** `npm run db:setup` and `npm run db:reset` use Bash scripts; use WSL or the manual steps in [db/README.md](db/README.md).
@@ -267,17 +403,16 @@ Most endpoints require a JWT in the `Authorization: Bearer <token>` header. Full
 
 **Done:**
 
+- There shall be a page explaining what the product does.
 - When a user updates their savings, the system shall update that users savings amount in the database.
 - The system shall display the current user's savings amount.
 - A user shall be able to create an account.
-- The system shall be deployed using vercell.
-
-**Not Done:**
-
+- The system shall be deployed using vercel.
 - When a user checks a to-do item, the system shall save the done status in the database.
-- There shall be a page explaining what the product does.
 - There shall be a questionnaire for the user.
 - When a user fills out the questionnaire, the system shall save their answers to the database.
 - If a user has already filled out the questionnaire, the system shall not prompt them to answer the questions again when they log in.
 - When the user finishes the survey, the system shall make a user's profile.
 - When the user finishes the survey, the system shall generate custom suggestions with ai.
+
+**Not Done:**
