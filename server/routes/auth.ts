@@ -88,6 +88,12 @@ router.post('/login', async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // Update last_login timestamp
+    await pool.query(
+      'UPDATE user_info SET last_login = NOW() WHERE user_id = $1',
+      [user.user_id]
+    );
+
     // Generate token
     const token = generateToken(user.user_id);
 

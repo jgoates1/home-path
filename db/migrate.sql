@@ -17,7 +17,9 @@ CREATE TABLE IF NOT EXISTS user_info (
   password                VARCHAR(255) NOT NULL,
   push_notifications_flag BOOLEAN DEFAULT FALSE,
   current_savings         DECIMAL(12,2) DEFAULT 0.00,
-  archetype               VARCHAR(20)
+  archetype               VARCHAR(20),
+  last_login              TIMESTAMP DEFAULT NOW(),
+  admin_flag              BOOLEAN DEFAULT FALSE
 );
 
 -- ── AI plan tables ────────────────────────────────────────────────────────────
