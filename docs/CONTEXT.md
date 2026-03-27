@@ -6,6 +6,8 @@ A first-time homebuyer guidance app. Users complete a 9-section chat-style surve
 ## Current Status
 Core app is live. Gemini 2.5-flash AI integration is complete — survey generates a personalized plan via `POST /api/surveys/generate-plan`. DB migration SQLs exist but must still be run against Supabase.
 
+Savings tracking lives in `user_financial_profile.current_savings` (not `user_info`). The savings goal on the dashboard comes from `user_plan_metrics.total_cash_needed`. Both are only available after the user completes the survey and generates a plan — the savings widget is hidden until then. Savings are updated via `PUT /api/users/savings`.
+
 ## Tech Stack
 - **Frontend**: React + TypeScript + Vite, Tailwind CSS, shadcn/ui
 - **Backend**: Express.js (TypeScript), deployed as serverless on Vercel

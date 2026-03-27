@@ -29,7 +29,7 @@ const DashboardPage = () => {
     .filter((t) => !t.completed)
     .slice(0, 5);
 
-  const goalAmount = targetSavings;
+  const goalAmount = targetSavings ?? 0;
   const savingsPercent = goalAmount > 0 ? Math.min(Math.round((savedAmount / goalAmount) * 100), 100) : 0;
 
   const handleConfirm = () => {
@@ -74,31 +74,33 @@ const DashboardPage = () => {
 
           {/* Right: Stats */}
           <div className="flex flex-col gap-6">
-            {/* Savings Progress */}
-            <div className="bg-card rounded-lg p-6 border border-border shadow-sm">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-md bg-secondary/15 flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-secondary" />
+            {/* Savings Progress (only shown after plan is generated) */}
+            {hasPlan && (
+              <div className="bg-card rounded-lg p-6 border border-border shadow-sm">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-md bg-secondary/15 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-secondary" />
+                  </div>
+                  <span className="font-bold text-foreground text-base">Savings Progress</span>
                 </div>
-                <span className="font-bold text-foreground text-base">Savings Progress</span>
+                <p className="text-3xl md:text-4xl font-heading font-bold text-secondary mb-2 tracking-tight">
+                  {fmt(savedAmount)}
+                </p>
+                <div className="w-full h-3 bg-muted rounded-full overflow-hidden mb-2">
+                  <div className="h-full bg-secondary rounded-full transition-all duration-700" style={{ width: `${savingsPercent}%` }} />
+                </div>
+                <p className="text-sm text-muted-foreground mb-3">
+                  <span className="font-bold text-secondary text-base">{savingsPercent}%</span>
+                  {goalAmount > 0 && <> of {fmt(goalAmount)} savings goal</>}
+                </p>
+                <button
+                  onClick={() => { setInputValue(savedAmount.toString()); setModalOpen(true); }}
+                  className="text-sm font-medium px-3 py-2 rounded-md bg-secondary/15 text-secondary hover:bg-secondary/20 transition-colors"
+                >
+                  Update savings
+                </button>
               </div>
-              <p className="text-3xl md:text-4xl font-heading font-bold text-secondary mb-2 tracking-tight">
-                {fmt(savedAmount)}
-              </p>
-              <div className="w-full h-3 bg-muted rounded-full overflow-hidden mb-2">
-                <div className="h-full bg-secondary rounded-full transition-all duration-700" style={{ width: `${savingsPercent}%` }} />
-              </div>
-              <p className="text-sm text-muted-foreground mb-3">
-                <span className="font-bold text-secondary text-base">{savingsPercent}%</span>
-                {goalAmount > 0 && <> of {fmt(goalAmount)} savings goal</>}
-              </p>
-              <button
-                onClick={() => { setInputValue(savedAmount.toString()); setModalOpen(true); }}
-                className="text-sm font-medium px-3 py-2 rounded-md bg-secondary/15 text-secondary hover:bg-secondary/20 transition-colors"
-              >
-                Update savings
-              </button>
-            </div>
+            )}
 
             {/* Overall Progress */}
             <div className="bg-card rounded-lg p-6 border border-border shadow-sm">
