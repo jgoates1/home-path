@@ -72,6 +72,13 @@ const AdminInsightsPage = () => {
         <h1 className="text-3xl font-bold">Admin Insights</h1>
       </div>
 
+      <div className="rounded-lg border border-border p-5 bg-card">
+        <h2 className="text-lg font-semibold mb-1">Objective</h2>
+        <p className="text-sm text-muted-foreground">
+          Become the trusted advisor through the duration of the homebuying journey
+        </p>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-lg border border-border p-5 bg-card">
           <h2 className="text-lg font-semibold">Weekly Active %</h2>
