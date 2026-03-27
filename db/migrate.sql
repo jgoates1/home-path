@@ -16,8 +16,9 @@ CREATE TABLE IF NOT EXISTS user_info (
   username                VARCHAR(50) NOT NULL UNIQUE,
   password                VARCHAR(255) NOT NULL,
   push_notifications_flag BOOLEAN DEFAULT FALSE,
-  current_savings         DECIMAL(12,2) DEFAULT 0.00,
-  archetype               VARCHAR(20)
+  archetype               VARCHAR(20),
+  last_login              TIMESTAMP DEFAULT NOW(),
+  admin_flag              BOOLEAN DEFAULT FALSE
 );
 
 -- ── AI plan tables ────────────────────────────────────────────────────────────
@@ -70,3 +71,6 @@ CREATE TABLE IF NOT EXISTS ai_todos (
 ALTER TABLE user_plan_metrics
   ADD COLUMN IF NOT EXISTS recommended_loan_type VARCHAR(50),
   ADD COLUMN IF NOT EXISTS step_goal_dates JSONB;
+
+-- ── Move savings tracking to user_financial_profile ─────────────────────────
+ALTER TABLE user_info DROP COLUMN IF EXISTS current_savings;

@@ -560,7 +560,11 @@ router.post('/generate-plan', authenticateToken, async (req: AuthRequest, res: R
       pool.query('SELECT step_order, tip_text FROM ai_tips WHERE user_id = $1 ORDER BY step_order, tip_order', [req.userId]),
     ]);
 
-    res.json(buildPlanResponse(financial_metrics, steps, todosResult.rows, tipsResult.rows, stepGoalDates));
+    const planResponse = buildPlanResponse(financial_metrics, steps, todosResult.rows, tipsResult.rows, stepGoalDates);
+    res.json({
+      ...planResponse,
+      current_savings: Number(financial.current_savings),
+    });
   } catch (error: any) {
     if (client) await client.query('ROLLBACK').catch(() => {});
     console.error('generate-plan error:', error);
@@ -598,15 +602,20 @@ router.get('/plan', authenticateToken, async (req: AuthRequest, res: Response) =
 
     const stepGoalDates: Record<string, string> = m.step_goal_dates ?? {};
 
-    const [todosResult, tipsResult] = await Promise.all([
+    const [todosResult, tipsResult, savingsResult] = await Promise.all([
       pool.query('SELECT id, step_order, todo_text, completed FROM ai_todos WHERE user_id = $1 ORDER BY step_order, id', [req.userId]),
       pool.query('SELECT step_order, tip_text FROM ai_tips WHERE user_id = $1 ORDER BY step_order, tip_order', [req.userId]),
+      pool.query('SELECT current_savings FROM user_financial_profile WHERE user_id = $1', [req.userId]),
     ]);
 
     const stepNames = ['Get Your Finances Ready', 'Get Pre-Approved', 'Find Your Home', 'Close the Deal'];
     const steps = stepNames.map((name, i) => ({ step_order: i + 1, step_name: name }));
 
-    res.json(buildPlanResponse(financial_metrics, steps, todosResult.rows, tipsResult.rows, stepGoalDates));
+    const planResponse = buildPlanResponse(financial_metrics, steps, todosResult.rows, tipsResult.rows, stepGoalDates);
+    res.json({
+      ...planResponse,
+      current_savings: Number(savingsResult.rows[0]?.current_savings ?? 0),
+    });
   } catch (error) {
     console.error('get-plan error:', error);
     res.status(500).json({ error: 'Failed to load plan' });

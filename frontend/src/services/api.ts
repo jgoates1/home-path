@@ -10,7 +10,6 @@ interface LoginResponse {
     email: string;
     username: string;
     archetype: string | null;
-    currentSavings: number;
     pushNotifications: boolean;
   };
   token: string;
@@ -131,7 +130,6 @@ class ApiService {
   async updateProfile(data: Partial<{
     username: string;
     archetype: string;
-    currentSavings: number;
     pushNotifications: boolean;
   }>) {
     const response = await this.fetchWithTimeout(`${API_BASE}/users/me`, {
@@ -141,6 +139,19 @@ class ApiService {
         ...this.getAuthHeader()
       },
       body: JSON.stringify(data)
+    }, 30000);
+    return this.handleResponse(response);
+  }
+
+  // Savings (stored in user_financial_profile)
+  async updateSavings(currentSavings: number) {
+    const response = await this.fetchWithTimeout(`${API_BASE}/users/savings`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify({ currentSavings }),
     }, 30000);
     return this.handleResponse(response);
   }

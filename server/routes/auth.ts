@@ -30,10 +30,10 @@ router.post('/register', async (req: Request, res: Response) => {
 
     // Create user
     const result = await pool.query(
-      `INSERT INTO user_info (email, username, password, archetype, current_savings)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING user_id, email, username, archetype, current_savings, push_notifications_flag`,
-      [email, username, hashedPassword, archetype || null, 0]
+      `INSERT INTO user_info (email, username, password, archetype)
+       VALUES ($1, $2, $3, $4)
+       RETURNING user_id, email, username, archetype, push_notifications_flag`,
+      [email, username, hashedPassword, archetype || null]
     );
 
     const user = result.rows[0];
@@ -46,9 +46,6 @@ router.post('/register', async (req: Request, res: Response) => {
         email: user.email,
         username: user.username,
         archetype: user.archetype,
-        currentSavings: user.current_savings,
-        // NOTE: Some local schemas don't have target_savings yet.
-        targetSavings: 50000,
         pushNotifications: user.push_notifications_flag
       },
       token
@@ -88,6 +85,12 @@ router.post('/login', async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // Update last_login timestamp
+    await pool.query(
+      'UPDATE user_info SET last_login = NOW() WHERE user_id = $1',
+      [user.user_id]
+    );
+
     // Generate token
     const token = generateToken(user.user_id);
 
@@ -98,9 +101,6 @@ router.post('/login', async (req: Request, res: Response) => {
         email: user.email,
         username: user.username,
         archetype: user.archetype,
-        currentSavings: user.current_savings,
-        // NOTE: Some local schemas don't have target_savings yet.
-        targetSavings: 50000,
         pushNotifications: user.push_notifications_flag
       },
       token

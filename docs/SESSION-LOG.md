@@ -2,6 +2,35 @@
 
 ---
 
+## 2026-03-26
+
+**What was done:**
+- Moved `current_savings` out of `user_info` and into `user_financial_profile` — dashboard now reads/writes savings from the financial profile table
+- Replaced hardcoded `targetSavings: 50000` with `user_plan_metrics.total_cash_needed` as the real savings goal
+- Added `PUT /api/users/savings` endpoint for updating savings (writes to `user_financial_profile`)
+- Added `current_savings` to `GET /api/surveys/plan` and `POST /api/surveys/generate-plan` responses
+- Removed `currentSavings` and `targetSavings` from auth/login/register and profile responses
+- Dashboard savings widget now hidden until user has a plan
+- Added `last_login` timestamp update on login (`auth.ts`)
+- Added `last_login` and `admin_flag` columns to `user_info` in `migrate.sql`
+
+**Files changed:**
+- `db/migrate.sql` — dropped `current_savings` from `user_info`, added `last_login` and `admin_flag`
+- `server/routes/users.ts` — added `PUT /savings`, removed savings from `GET/PUT /me`
+- `server/routes/auth.ts` — removed savings from responses, added `last_login` update
+- `server/routes/surveys.ts` — added `current_savings` to plan responses
+- `frontend/src/services/api.ts` — added `updateSavings()`, removed savings from types
+- `frontend/src/contexts/AuthContext.tsx` — removed `currentSavings`/`targetSavings` from User
+- `frontend/src/contexts/SurveyContext.tsx` — loads savings from plan, uses `api.updateSavings()`
+- `frontend/src/pages/DashboardPage.tsx` — savings widget gated on `hasPlan`
+- `docs/CONTEXT.md`, `docs/DECISIONS.md`, `docs/SESSION-LOG.md`
+
+**Next steps:**
+- Run `migrate.sql` against Supabase production
+- Teammates run `psql -d homepath_db -f db/migrate.sql` to sync local DB
+
+---
+
 ## 2026-03-25 (session 2)
 
 **What was done:**

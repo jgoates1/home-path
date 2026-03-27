@@ -28,7 +28,7 @@ interface SurveyContextType {
   committedTimeline: string;
   setCommittedTimeline: (t: string) => void;
   savedAmount: number;
-  targetSavings: number;
+  targetSavings: number | null;
   setSavedAmount: (n: number) => Promise<void>;
   submitSurvey: (inputs: SurveyInputs) => Promise<void>;
   toggleTodo: (stepId: number, todoId: number) => Promise<void>;
@@ -91,19 +91,13 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
   const [steps, setSteps] = useState<StepData[]>([]);
   const [committedTimeline, setCommittedTimelineState] = useState("");
   const [savedAmount, setSavedAmountState] = useState(0);
-  const [targetSavings, setTargetSavings] = useState(50000);
+  const [targetSavings, setTargetSavings] = useState<number | null>(null);
 
   const currentStep = useMemo(() => computeRoadmapCurrentStep(steps), [steps]);
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
     if (!token) return;
-
-    // Load current_savings and target_savings from the user profile
-    api.getProfile().then((profile: any) => {
-      if (profile.currentSavings != null) setSavedAmountState(Number(profile.currentSavings));
-      if (profile.targetSavings != null) setTargetSavings(Number(profile.targetSavings));
-    }).catch(() => {});
 
     const ct = localStorage.getItem("homeapp_timeline_commit");
     if (ct) setCommittedTimelineState(ct);
@@ -125,8 +119,9 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
     setSteps(buildStepsFromPlan(plan.steps));
     setHasPlan(true);
 
-    // Sync completion state from DB into steps
-    setSteps(buildStepsFromPlan(plan.steps));
+    // Load savings data from plan response
+    if (plan.current_savings != null) setSavedAmountState(Number(plan.current_savings));
+    if (plan.financial_metrics?.total_cash_needed != null) setTargetSavings(Number(plan.financial_metrics.total_cash_needed));
   };
 
   const submitSurvey = async (inputs: SurveyInputs) => {
@@ -152,7 +147,7 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
   const setSavedAmount = async (n: number) => {
     setSavedAmountState(n);
     try {
-      await api.updateProfile({ currentSavings: n });
+      await api.updateSavings(n);
     } catch {
       // keep local value even if API fails
     }
@@ -197,11 +192,8 @@ export const SurveyProvider = ({ children }: { children: ReactNode }) => {
     setHasPlan(false);
     setPlanMetrics(null);
     setSteps([]);
-    try {
-      const profile = await api.getProfile() as any;
-      if (profile.currentSavings != null) setSavedAmountState(Number(profile.currentSavings));
-      if (profile.targetSavings != null) setTargetSavings(Number(profile.targetSavings));
-    } catch {}
+    setSavedAmountState(0);
+    setTargetSavings(null);
     await loadPlanFromDatabase();
   };
 
