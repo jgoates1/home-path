@@ -32,7 +32,7 @@ router.post('/register', async (req: Request, res: Response) => {
     const result = await pool.query(
       `INSERT INTO user_info (email, username, password, archetype)
        VALUES ($1, $2, $3, $4)
-       RETURNING user_id, email, username, archetype, push_notifications_flag`,
+       RETURNING user_id, email, username, archetype, push_notifications_flag, admin_flag`,
       [email, username, hashedPassword, archetype || null]
     );
 
@@ -46,7 +46,8 @@ router.post('/register', async (req: Request, res: Response) => {
         email: user.email,
         username: user.username,
         archetype: user.archetype,
-        pushNotifications: user.push_notifications_flag
+        pushNotifications: user.push_notifications_flag,
+        adminFlag: user.admin_flag
       },
       token
     });
@@ -101,7 +102,8 @@ router.post('/login', async (req: Request, res: Response) => {
         email: user.email,
         username: user.username,
         archetype: user.archetype,
-        pushNotifications: user.push_notifications_flag
+        pushNotifications: user.push_notifications_flag,
+        adminFlag: user.admin_flag
       },
       token
     });

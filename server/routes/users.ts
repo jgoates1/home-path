@@ -8,7 +8,7 @@ const router = Router();
 router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const result = await pool.query(
-      `SELECT user_id, email, username, archetype, push_notifications_flag
+      `SELECT user_id, email, username, archetype, push_notifications_flag, admin_flag
        FROM user_info WHERE user_id = $1`,
       [req.userId]
     );
@@ -23,7 +23,8 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
       email: user.email,
       username: user.username,
       archetype: user.archetype,
-      pushNotifications: user.push_notifications_flag
+      pushNotifications: user.push_notifications_flag,
+      adminFlag: user.admin_flag
     });
   } catch (error) {
     console.error('Get user error:', error);
@@ -42,7 +43,7 @@ router.put('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
            archetype = COALESCE($2, archetype),
            push_notifications_flag = COALESCE($3, push_notifications_flag)
        WHERE user_id = $4
-       RETURNING user_id, email, username, archetype, push_notifications_flag`,
+       RETURNING user_id, email, username, archetype, push_notifications_flag, admin_flag`,
       [username, archetype, pushNotifications, req.userId]
     );
 
@@ -54,7 +55,8 @@ router.put('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
         email: user.email,
         username: user.username,
         archetype: user.archetype,
-        pushNotifications: user.push_notifications_flag
+        pushNotifications: user.push_notifications_flag,
+        adminFlag: user.admin_flag
       }
     });
   } catch (error) {

@@ -8,6 +8,7 @@ import { SurveyProvider } from "@/contexts/SurveyContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import AppHeader from "@/components/AppHeader";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import ProtectedAdminRoute from "@/components/ProtectedAdminRoute";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import CreateAccountPage from "./pages/CreateAccountPage";
@@ -20,6 +21,7 @@ import StepDetailPage from "./pages/StepDetailPage";
 import ProfilePage from "./pages/ProfilePage";
 import SurveyInsightsPage from "./pages/SurveyInsightsPage";
 import PlanLoadingPage from "./pages/PlanLoadingPage";
+import AdminInsightsPage from "./pages/AdminInsightsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +49,7 @@ const App = () => (
               <Route path="/step/:stepId" element={<ProtectedRoute><StepDetailPage /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
               <Route path="/survey-insights" element={<ProtectedRoute><SurveyInsightsPage /></ProtectedRoute>} />
+              <Route path="/admin-insights" element={<ProtectedAdminRoute><AdminInsightsPage /></ProtectedAdminRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             </SurveyProvider>

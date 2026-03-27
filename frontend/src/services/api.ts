@@ -11,6 +11,7 @@ interface LoginResponse {
     username: string;
     archetype: string | null;
     pushNotifications: boolean;
+    adminFlag?: boolean;
   };
   token: string;
 }
@@ -322,6 +323,15 @@ class ApiService {
 
   async getPlan() {
     const response = await this.fetchWithTimeout(`${API_BASE}/surveys/plan`, {
+      headers: this.getAuthHeader(),
+    }, 30000);
+    return this.handleResponse(response);
+  }
+
+  async getAdminLoginActivity(): Promise<{
+    users: Array<{ id: number; username: string; lastLogin: string }>;
+  }> {
+    const response = await this.fetchWithTimeout(`${API_BASE}/admin/login-activity`, {
       headers: this.getAuthHeader(),
     }, 30000);
     return this.handleResponse(response);

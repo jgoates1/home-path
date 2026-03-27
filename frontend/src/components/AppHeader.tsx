@@ -6,7 +6,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Home, Menu, X, Sun, Moon } from "lucide-react";
 
 const AppHeader = () => {
-  const { isLoggedIn, hasCompletedSurvey, logout } = useAuth();
+  const { isLoggedIn, hasCompletedSurvey, logout, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -24,6 +24,7 @@ const AppHeader = () => {
     { label: "Dashboard", path: "/dashboard" },
     { label: "My Profile", path: "/profile" },
     { label: "Survey Insights", path: "/survey-insights" },
+    ...(user?.adminFlag ? [{ label: "Admin Insights", path: "/admin-insights" }] : []),
   ];
 
   return (
