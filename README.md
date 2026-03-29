@@ -115,19 +115,17 @@ npm run dev
 
    - Optional: `PORT` (backend defaults to 3001 if unset)
 
-3. **Create the database and load schema and seed data**
-   - **macOS / Linux:** Run `npm run db:setup`. This creates the database, runs `db/schema.sql`, then runs `db/seed.sql`.
-   - **Windows (if Bash is not available):** Create the database, then run the SQL files manually:
+3. **Create the database and run migrations**
+   - **macOS / Linux:** Run `npm run db:setup`. This creates the database and runs `db/migrate.sql`.
+   - **Windows (if Bash is not available):** Create the database, then run the migration SQL file manually:
      ```sh
      createdb homepath_db
-     psql -d homepath_db -f db/schema.sql
-     psql -d homepath_db -f db/seed.sql
+     psql -d homepath_db -f db/migrate.sql
      ```
      ```sh
-     psql -U "YourUsername" -d homepath_db -f db/schema.sql
-     psql -U "YourUsername" -d homepath_db -f db/seed.sql
+     psql -U "YourUsername" -d homepath_db -f db/migrate.sql
      ```
-   - Alternatively use only schema: `npm run db:schema`. Only seed: `npm run db:seed`. See [db/README.md](db/README.md) for more.
+   - See [db/README.md](db/README.md) for more details.
 
 ## Running the Application
 
@@ -278,10 +276,8 @@ You can repeat the same idea with other flows (e.g. complete a survey response, 
 | `npm run preview`        | Serve built frontend (after `npm run build`)                    |
 | `npm run lint`           | Run ESLint                                                      |
 | `npm run test`           | Run frontend tests (Vitest)                                     |
-| `npm run db:setup`       | Create DB, run schema and seed (Bash; see db/README on Windows) |
+| `npm run db:setup`       | Create DB and run migrations (Bash; see db/README on Windows)    |
 | `npm run db:reset`       | Drop and recreate database (Bash; see db/README on Windows)     |
-| `npm run db:schema`      | Apply schema only: `psql -d homepath_db -f db/schema.sql`       |
-| `npm run db:seed`        | Run seed only: `psql -d homepath_db -f db/seed.sql`             |
 
 ## Project Structure
 

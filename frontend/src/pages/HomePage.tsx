@@ -18,7 +18,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-background">
+    <div className="flex flex-col items-center justify-center min-h-0 h-[calc(100vh-80px)] px-2 py-1 bg-background overflow-hidden">
       <div className="animate-fade-in flex flex-col items-center text-center max-w-md">
         <img src={dreamHome} alt="Your dream home" className="w-64 h-64 object-contain mb-8 drop-shadow-lg" />
 

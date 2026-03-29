@@ -8,9 +8,9 @@ const ProfilePage = () => {
   const { getCompletionPercent, planMetrics } = useSurvey();
 
   return (
-    <div className="min-h-screen bg-background pb-12">
-      <div className="max-w-md mx-auto px-6 py-8 animate-fade-in">
-        <h1 className="text-3xl font-heading font-bold text-center text-foreground mb-8">Your Profile</h1>
+    <div className="flex flex-col items-center justify-center min-h-0 h-[calc(100vh-80px)] bg-background overflow-hidden">
+      <div className="max-w-md w-full mx-auto px-2 py-4 animate-fade-in">
+        <h1 className="text-3xl font-heading font-bold text-center text-foreground mb-8">{user?.name || "Profile"}</h1>
 
         <div className="flex flex-col items-center mb-8">
           <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-4">

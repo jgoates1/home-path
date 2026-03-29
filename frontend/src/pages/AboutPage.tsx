@@ -1,4 +1,5 @@
 import React from "react";
+import { BackToTopButton } from "@/components/BackToTopButton";
 import { useNavigate } from "react-router-dom";
 import { ClipboardCheck, Search, Home, TrendingUp } from "lucide-react";
 
@@ -41,6 +42,7 @@ const AboutPage = () => {
           Start Your Survey
         </button>
       </div>
+      <BackToTopButton />
     </div>
   );
 };
