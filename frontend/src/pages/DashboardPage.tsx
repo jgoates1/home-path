@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSurvey } from "@/contexts/SurveyContext";
 import RoadmapVisual from "@/components/RoadmapVisual";
+import { BackToTopButton } from "@/components/BackToTopButton";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { TrendingUp, Target, ListChecks, BarChart3 } from "lucide-react";
 import {
   Dialog,
@@ -93,12 +95,17 @@ const DashboardPage = () => {
                   <span className="font-bold text-secondary text-base">{savingsPercent}%</span>
                   {goalAmount > 0 && <> of {fmt(goalAmount)} savings goal</>}
                 </p>
-                <button
-                  onClick={() => { setInputValue(savedAmount.toString()); setModalOpen(true); }}
-                  className="text-sm font-medium px-3 py-2 rounded-md bg-secondary/15 text-secondary hover:bg-secondary/20 transition-colors"
-                >
-                  Update savings
-                </button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => { setInputValue(savedAmount.toString()); setModalOpen(true); }}
+                      className="text-sm font-medium px-3 py-2 rounded-md bg-secondary/15 text-secondary hover:bg-secondary/20 transition-colors"
+                    >
+                      Update savings
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>Edit your current savings amount</TooltipContent>
+                </Tooltip>
               </div>
             )}
 
@@ -221,6 +228,7 @@ const DashboardPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    <BackToTopButton />
     </main>
   );
 };

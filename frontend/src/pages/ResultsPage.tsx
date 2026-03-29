@@ -1,4 +1,5 @@
 import React from "react";
+import { BackToTopButton } from "@/components/BackToTopButton";
 import { useNavigate } from "react-router-dom";
 import { useSurvey } from "@/contexts/SurveyContext";
 import { Search, Zap, Clock, Compass } from "lucide-react";
@@ -83,6 +84,7 @@ const ResultsPage = () => {
           Commit to Your Timeline
         </button>
       </div>
+      <BackToTopButton />
     </div>
   );
 };

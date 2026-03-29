@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { BackToTopButton } from "@/components/BackToTopButton";
 import { useNavigate } from "react-router-dom";
 import { useSurvey } from "@/contexts/SurveyContext";
 import { SurveyInputs } from "@/types/plan";
@@ -388,6 +389,7 @@ const SurveyPage = () => {
       )}
 
       </div>
+      <BackToTopButton />
     </div>
   );
 };

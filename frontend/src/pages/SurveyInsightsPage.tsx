@@ -1,4 +1,5 @@
 import React from "react";
+import { BackToTopButton } from "@/components/BackToTopButton";
 import { useNavigate } from "react-router-dom";
 import { useSurvey } from "@/contexts/SurveyContext";
 import { ChevronLeft, Edit3 } from "lucide-react";
@@ -47,6 +48,7 @@ const SurveyInsightsPage = () => {
           Retake Survey
         </button>
       </div>
+      <BackToTopButton />
     </div>
   );
 };

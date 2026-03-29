@@ -1,4 +1,5 @@
 import React from "react";
+import { BackToTopButton } from "@/components/BackToTopButton";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSurvey } from "@/contexts/SurveyContext";
 import { ChevronLeft, CheckCircle2 } from "lucide-react";
@@ -86,6 +87,7 @@ const StepDetailPage = () => {
           <p className="text-muted-foreground text-sm">Complete the survey to see your personalized tips and tasks for this step.</p>
         )}
       </div>
+      <BackToTopButton />
     </div>
   );
 };

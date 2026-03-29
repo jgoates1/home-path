@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { useSurvey } from "@/contexts/SurveyContext";
 import { CheckCircle2, Lock } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 
 const RoadmapVisual = () => {
   const { steps, currentStep } = useSurvey();
@@ -102,12 +103,13 @@ const RoadmapVisual = () => {
   const pathD = "M60 30 Q180 80 200 130 Q220 180 80 210 Q-20 240 80 290 Q180 340 190 380";
 
   return (
-    <div
-      className="relative w-full rounded-lg overflow-hidden pl-24"
-      style={{ height: 420, background: "hsl(var(--map-bg))" }}
-      role="img"
-      aria-label="Home buying roadmap showing your progress through 4 steps"
-    >
+    <TooltipProvider>
+      <div
+        className="relative w-full rounded-lg overflow-hidden pl-24"
+        style={{ height: 420, background: "hsl(var(--map-bg))" }}
+        role="img"
+        aria-label="Home buying roadmap showing your progress through 4 steps"
+      >
       {/* Road path SVG — viewBox adds left padding so road and step 1 have room */}
       <svg
         className="absolute inset-0 w-full h-full"
@@ -176,48 +178,59 @@ const RoadmapVisual = () => {
       {steps.map((step, i) => {
         const status = getStepStatus(step.id);
         const pos = positions[i];
-
+        let tooltipMsg = "";
+        if (status === "locked") {
+          tooltipMsg = "Complete previous steps to unlock this step.";
+        } else {
+          tooltipMsg = "Click to view and check off tasks for this step.";
+        }
         return (
-          <button
-            key={step.id}
-            onClick={() => status !== "locked" && navigate(`/step/${step.id}`)}
-            disabled={status === "locked"}
-            aria-disabled={status === "locked"}
-            aria-label={`Step ${step.id}: ${step.title} — ${statusLabel(status)}`}
-            className={`absolute flex flex-col items-center gap-1.5 transition-colors duration-200 group focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg p-1 ${
-              status === "locked" ? "cursor-not-allowed" : "cursor-pointer hover:opacity-90"
-            }`}
-            style={{ left: pos.left, top: pos.top, transform: "translate(-50%, 0)" }}
-          >
-            <div
-              className={`w-12 h-12 rounded-lg flex items-center justify-center shadow-md transition-colors ring-1 ring-offset-1 ring-offset-[hsl(var(--map-bg))] ${
-                status === "complete"
-                  ? "bg-accent text-accent-foreground ring-accent/60"
-                  : status === "active"
-                  ? "bg-primary text-primary-foreground ring-primary/60"
-                  : "bg-surface-container-high text-muted-foreground ring-border/70"
-              }`}
-            >
-              {status === "complete" ? (
-                <CheckCircle2 className="w-6 h-6" aria-hidden="true" />
-              ) : status === "locked" ? (
-                <Lock className="w-5 h-5" aria-hidden="true" />
-              ) : (
-                <span className="text-lg font-bold">{step.id}</span>
-              )}
-            </div>
-            <span className="text-[0.7rem] font-semibold text-center max-w-[110px] leading-snug text-foreground">
-              {step.title === "Find Your Home" ? (
-                <>
-                  Find Your
-                  <br />
-                  Home
-                </>
-              ) : (
-                step.title
-              )}
-            </span>
-          </button>
+          <Tooltip key={step.id}>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => status !== "locked" && navigate(`/step/${step.id}`)}
+                disabled={status === "locked"}
+                aria-disabled={status === "locked"}
+                aria-label={`Step ${step.id}: ${step.title} — ${statusLabel(status)}`}
+                className={`absolute flex flex-col items-center gap-1.5 transition-colors duration-200 group focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg p-1 ${
+                  status === "locked" ? "cursor-not-allowed" : "cursor-pointer hover:opacity-90"
+                }`}
+                style={{ left: pos.left, top: pos.top, transform: "translate(-50%, 0)" }}
+              >
+                <div
+                  className={`w-12 h-12 rounded-lg flex items-center justify-center shadow-md transition-colors ring-1 ring-offset-1 ring-offset-[hsl(var(--map-bg))] ${
+                    status === "complete"
+                      ? "bg-accent text-accent-foreground ring-accent/60"
+                      : status === "active"
+                      ? "bg-primary text-primary-foreground ring-primary/60"
+                      : "bg-surface-container-high text-muted-foreground ring-border/70"
+                  }`}
+                >
+                  {status === "complete" ? (
+                    <CheckCircle2 className="w-6 h-6" aria-hidden="true" />
+                  ) : status === "locked" ? (
+                    <Lock className="w-5 h-5" aria-hidden="true" />
+                  ) : (
+                    <span className="text-lg font-bold">{step.id}</span>
+                  )}
+                </div>
+                <span className="text-[0.7rem] font-semibold text-center max-w-[110px] leading-snug text-foreground">
+                  {step.title === "Find Your Home" ? (
+                    <>
+                      Find Your
+                      <br />
+                      Home
+                    </>
+                  ) : (
+                    step.title
+                  )}
+                </span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" align="center">
+              {tooltipMsg}
+            </TooltipContent>
+          </Tooltip>
         );
       })}
 
@@ -243,7 +256,8 @@ const RoadmapVisual = () => {
           document.body
         )}
 
-    </div>
+      </div>
+    </TooltipProvider>
   );
 };
 

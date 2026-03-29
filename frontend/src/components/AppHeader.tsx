@@ -4,6 +4,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Home, Menu, X, Sun, Moon } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 const AppHeader = () => {
   const { isLoggedIn, hasCompletedSurvey, logout, user } = useAuth();
@@ -29,40 +30,55 @@ const AppHeader = () => {
 
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between min-h-[64px] px-6 md:px-8 py-4 bg-background border-b border-border backdrop-blur-sm">
-      <button
-        onClick={handleHomeClick}
-        className="p-3 -m-1 rounded-md hover:bg-muted/50 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
-        aria-label="Go to homepage"
-      >
-        <Home className="w-6 h-6 md:w-7 md:h-7 text-primary" />
-      </button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={handleHomeClick}
+              className="p-3 -m-1 rounded-md hover:bg-muted/50 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              aria-label="Go to homepage"
+            >
+              <Home className="w-6 h-6 md:w-7 md:h-7 text-primary" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Go to homepage</TooltipContent>
+        </Tooltip>
 
-      <h1 className="text-xl md:text-2xl font-heading font-bold tracking-tight">
-        <span className="text-primary">Home</span>
-        <span className="text-secondary">Key</span>
-      </h1>
+        <h1 className="text-xl md:text-2xl font-heading font-bold tracking-tight">
+          <span className="text-primary">Home</span>
+          <span className="text-secondary">Key</span>
+        </h1>
 
-      <div className="flex items-center gap-1">
-        <button
-          onClick={toggleTheme}
-          className="p-3 -m-1 rounded-md hover:bg-muted/50 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground"
-          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-        >
-          {theme === "dark" ? <Sun className="w-5 h-5 md:w-6 md:h-6" /> : <Moon className="w-5 h-5 md:w-6 md:h-6" />}
-        </button>
-        {isLoggedIn ? (
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="p-3 -m-1 rounded-md hover:bg-muted/50 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
-          >
-            {menuOpen ? <X className="w-6 h-6 md:w-7 md:h-7 text-foreground" /> : <Menu className="w-6 h-6 md:w-7 md:h-7 text-foreground" />}
-          </button>
-        ) : (
-          <div className="min-w-[44px] min-h-[44px]" aria-hidden="true" />
-        )}
-      </div>
+        <div className="flex items-center gap-1">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={toggleTheme}
+                className="p-3 -m-1 rounded-md hover:bg-muted/50 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground"
+                aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {theme === "dark" ? <Sun className="w-5 h-5 md:w-6 md:h-6" /> : <Moon className="w-5 h-5 md:w-6 md:h-6" />}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}</TooltipContent>
+          </Tooltip>
+          {isLoggedIn ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className="p-3 -m-1 rounded-md hover:bg-muted/50 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  aria-label={menuOpen ? "Close menu" : "Open menu"}
+                  aria-expanded={menuOpen}
+                >
+                  {menuOpen ? <X className="w-6 h-6 md:w-7 md:h-7 text-foreground" /> : <Menu className="w-6 h-6 md:w-7 md:h-7 text-foreground" />}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{menuOpen ? "Close menu" : "Open menu"}</TooltipContent>
+            </Tooltip>
+          ) : (
+            <div className="min-w-[44px] min-h-[44px]" aria-hidden="true" />
+          )}
+        </div>
 
       {/* Slide-out menu — portaled to body so it overlays full viewport */}
       {menuOpen &&
@@ -80,28 +96,37 @@ const AppHeader = () => {
             >
               <div className="flex items-center justify-between p-4 border-b border-border shrink-0 bg-surface-container">
                 <span className="font-semibold text-foreground">Menu</span>
-                <button
-                  onClick={() => setMenuOpen(false)}
-                  className="p-2 rounded-md hover:bg-muted text-foreground focus-visible:ring-2 focus-visible:ring-primary"
-                  aria-label="Close menu"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => setMenuOpen(false)}
+                      className="p-2 rounded-md hover:bg-muted text-foreground focus-visible:ring-2 focus-visible:ring-primary"
+                      aria-label="Close menu"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>Close menu</TooltipContent>
+                </Tooltip>
               </div>
               <div className="flex-1 p-4 space-y-1 bg-card">
                 {menuItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setMenuOpen(false)}
-                    className={`block w-full py-3 px-4 rounded-md text-base font-medium transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
-                      location.pathname === item.path
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:bg-surface-container-high text-foreground"
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
+                  <Tooltip key={item.path}>
+                    <TooltipTrigger asChild>
+                      <Link
+                        to={item.path}
+                        onClick={() => setMenuOpen(false)}
+                        className={`block w-full py-3 px-4 rounded-md text-base font-medium transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                          location.pathname === item.path
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-surface-container-high text-foreground"
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>Go to {item.label}</TooltipContent>
+                  </Tooltip>
                 ))}
               </div>
               <div className="p-4 border-t border-border shrink-0 bg-surface-container">
